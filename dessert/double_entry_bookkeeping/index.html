@@ -1,0 +1,992 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/morty.jpeg">
+  <link rel="icon" href="/img/morty.jpeg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="kayce">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="从技术视角看待复式记账法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「甜点」：复式记账法">
+<meta property="og:url" content="https://kayce.world/dessert/double_entry_bookkeeping/index.html">
+<meta property="og:site_name" content="kayce">
+<meta property="og:description" content="从技术视角看待复式记账法">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-12-16T14:41:53.000Z">
+<meta property="article:modified_time" content="2024-12-16T14:41:53.000Z">
+<meta property="article:author" content="kayce">
+<meta property="article:tag" content="Finance">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>「甜点」：复式记账法 - kayce</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"kayce.world","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>kayce&#39;s world</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/music/" target="_self">
+                <i class="iconfont icon-music"></i>
+                <span>Music</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/RanchoNight_16_Tree.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「甜点」：复式记账法"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        kayce
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-12-16 22:41" pubdate>
+          December 16, 2024 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> views
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">「甜点」：复式记账法</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>「甜点」：只看一件事的一个点，告别 TL;DR，拥抱 RTFM。</p>
+</blockquote>
+<h2 id="核心点">核心点</h2>
+<ul>
+<li>有借必有贷，借贷必相等</li>
+<li>借 = debit，贷 = credit</li>
+</ul>
+<p>核心点不难理解，就是字面意思。只是注意不要陷入中文的语言陷阱中 —— 有人觉得&quot;找银行借钱和找银行贷款&quot;是同一个意思，于是就会搞混 debit 和 credit 的概念。</p>
+<p>你只需要记住&quot;贷 credit&quot;才是需要偿还的即可（类比你的房贷）。如果你希望让&quot;借&quot;的理解更合理，你可以理解为是你把钱借给了银行，因为钱是你的，而你放在银行那存着。</p>
+<h2 id="记账过程">记账过程</h2>
+<p>假设我使用某支付平台通过我的银行卡支付了 5 元购买了一瓶饮料，我的钱最终应该从我的账户流向商家的账户，理论上来说一个完备的记账流程大致如下：</p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>D 应收待清算</th>
+<th>C 网关过渡户</th>
+<th>C 商户待结算</th>
+<th>D 应收应清算</th>
+<th>D 备付金头寸</th>
+<th>C 商户余额户</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>渠道扣款成功</td>
+<td>D + 5</td>
+<td>C + 5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>支付成功</td>
+<td></td>
+<td>D - 5</td>
+<td>C + 5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>网联清分完成(完成明细对账)</td>
+<td>C - 5</td>
+<td></td>
+<td></td>
+<td>D + 5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>资金到账(完成资金对账)</td>
+<td></td>
+<td></td>
+<td></td>
+<td>C - 5</td>
+<td>D + 5</td>
+<td></td>
+</tr>
+<tr>
+<td>结算完成</td>
+<td></td>
+<td></td>
+<td>D - 5</td>
+<td></td>
+<td></td>
+<td>C + 5</td>
+</tr>
+</tbody>
+</table>
+<p>我们先不管上述复杂的流程，按照下面的步骤从易到难逐步理解。</p>
+<hr>
+<h3 id="一、事件">一、事件</h3>
+<p>事件的类型已经在上面标注出来了，你可以理解为这是行业内的通用实践，也可以理解为这是基于安全考量所必备的一些步骤。</p>
+<p>比如，理论上来说，平台给商家打款，也可以不关心外部的网联的对账：</p>
+<details>
+<summary><i>TL;DR 点击展开</i></summary>
+<blockquote>
+假设我是「XX 支付」，用户的钱在我的系统里本质上只是一个数字，在不涉及出入金的情况下，我完全可以随意修改这个数字。<br>
+平台的零钱 / 余额只能在平台内流通，直到你点击「提现到银行卡」，这笔钱我才真正需要和银行结算。<br>
+因此用户付费购买商品这个流程，我可以直接把 user.balance - 5, merchant.balance + 5，然后告诉商家「你的钱到账了」。<br>
+我们之所以需要消费上述的具体事件来推进流程，是因为这笔钱的来源并不是平台内的用户零钱，而是用户的银行卡，也就是说用户选择了「使用银行卡支付」。<br>
+所以如果我主动跳过其中的核心检查步骤，直接给商户加钱，那么万一用户的银行卡扣款失败，那我作为平台就损失了 5 元。
+</blockquote>
+</details>
+<hr>
+<h3 id="二、C-D-的特征">二、C / D 的特征</h3>
+<p>复习一下：C = credit 贷记，D = debit 借记。</p>
+<p>我们不难发现上述表中有如下特征：</p>
+<ul>
+<li>
+<p>每一列的 C 和 D 的和都是 0（除了最后两列）</p>
+<details>
+<summary><i>解释</i></summary>
+<blockquote>
+<u>每一列代表的都是某个独立账户的变动</u>，那么显然，除了最终的商户余额户和备付金头寸，其他账户的变动都是功能性的、短暂的。<br>
+换句话来说，钱只是经过这些账户流入了商户的钱包，这些账户在不收取手续费的情况下，不应该从中拿取或者给予任何金额。<br>
+为什么后两列不符合特征呢？因为商户通过卖饮料赚到了 5 元。
+</blockquote>
+</details>
+</li>
+<li>
+<p>每一行的 C 和 D 的和都是 0（除了第一行）</p>
+<details>
+<summary><i>解释</i></summary>
+<blockquote>
+<u>每一行代表的都是一个事件产生的账户变动</u>，这个变动显然是双向的，要符合借贷必相等的原则。<br>
+为什么第一行不符合特征呢？因为商户本质是要收钱的，这个钱本身就是由外部用户的银行卡流入我们平台再结算给商户的。<br>
+换句话来说，我向第一个杯子里倒了水，此时第一个杯子里的水就独立的增加了，后续向第二第三个杯子里转移水的时候，前一个杯子里的水会减少，后一个杯子里的水会增加。
+</blockquote>
+</details>
+</li>
+<li>
+<p>符号与账户类型对应</p>
+<details>
+<summary><i>解释</i></summary>
+<blockquote>
+<u>账户本身的CD代表了账户的基本属性——表达资产还是负债</u>。<br>
+那么对应的，如果我是一个负债账户C，此时我又额外背上了一笔贷款，显然我在这个账户上应该使用加法，而不是减法。<br>
+同样，如果我还清了一笔债务D，那么我应该使用减法，而不是加法。<br>
+</blockquote>
+</details>
+</li>
+</ul>
+<hr>
+<h3 id="三、账户的功能">三、账户的功能</h3>
+<p>现在我们可以尝试理解，为什么我们会定义这么多账户了，每个账户又有什么功能。<br>
+主要考虑以下两个方面：</p>
+<h4 id="账户的属性-——-资产还是负债">账户的属性 —— 资产还是负债?</h4>
+<p>这一步比较复杂，说起来也比较抽象，更像是一个逻辑题 / 文字游戏。我个人认为，单个账户本身的属性是什么都不重要，重要的是账户之间的关系。</p>
+<p>比如，我用 0 / 1 来标注账户属性显然是完全可以的，关键点在于当前账户的对手账户必须是我的属性的对立面。</p>
+<p>例如，商户的余额账户，显然和平台的备付金账户是对立的，因为商户的余额账户是平台的负债，而备付金账户是平台的资产。那么如果我用 1 标注了其中一者，那么另一个账户就必须用 0 标注。</p>
+<p>然后我们在&quot;符合逻辑&quot;的基础上，可以根据实际情况来定义账户的属性。比如前面说了，商户的余额账户，显然是平台的负债，我们就给它赋予 C 的属性，然后给备付金账户赋予 D 的属性。</p>
+<hr>
+<h4 id="账户的功能-——-用途是什么">账户的功能 —— 用途是什么?</h4>
+<p>如果我们直接去探究某一个具体账户的功能，可能会感觉有些头疼。因此我们需要转换一下思路：<br>
+当我们站在技术的视角上审视这个问题，可能会更简单一些。作为平台，我们显然需要对安全性和健壮性负责，避免出现任何资金的误差导致资金的亏损和信誉的下降。</p>
+<p>因此，我们可能会首先归纳出，外部事件的种类和功能，然后选取必要的事件进行消费，同时构建其状态机 —— 形成一个事件驱动的模型。<br>
+那么每个账户的功能就是在这个状态机中的一个节点，我们需要在这个节点上完成一些操作，然后将状态转移到下一个节点。</p>
+<p>举例来说，上述记账过程中，最抽象的账户是「C 网关过渡户」，这看起来就很 Hack，不像是金融领域的术语和模型。但是如果我们站在状态机的视角来观察，你会发现它的功能其实是很明确的：帮助我们消费「支付成功」这个事件，也就是说，如果「C 网关过渡户」里面的负债过多，那显然意味着外部平台的资金没有及时完成支付，我们需要联系对应的平台进行处理。</p>
+<p>类似的，如果我们的「D 应收应清算」里面的头寸过多，那么显然意味着外部平台比如银行没有及时的把资金转入我们的平台账户中，钱还卡在银行那，我们此时应该及时联系银行进行处理。</p>
+<blockquote>
+<p>上述没有及时结算的状态，在金融领域往往被称为「风险敞口」<br>
+这个敞口需要我们及时的进行处理，处理的过程往往被称为「头寸管理(Position Management)」或者「平盘」<br>
+如果平台不及时的进行平盘，那么显然当用户大量提现的时候，平台就会出现资金链断裂的情况，导致资金的亏损和信誉的下降。</p>
+</blockquote>
+<br>
+为了方便理解以上陈述，我们做出一个假设：银行渠道扣款和支付成功是一回事，于是可以剔除「C 网关过渡户」进行简化，表格也就变成了如下样貌：
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>D 应收待清算</th>
+<th>C 商户待结算</th>
+<th>D 应收应清算</th>
+<th>D 备付金头寸</th>
+<th>C 商户余额户</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>渠道扣款成功</td>
+<td>D + 5</td>
+<td>C + 5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>网联清分完成(完成明细对账)</td>
+<td>C - 5</td>
+<td></td>
+<td>D + 5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>资金到账(完成资金对账)</td>
+<td></td>
+<td></td>
+<td>C - 5</td>
+<td>D + 5</td>
+<td></td>
+</tr>
+<tr>
+<td>结算完成</td>
+<td></td>
+<td>D - 5</td>
+<td></td>
+<td></td>
+<td>C + 5</td>
+</tr>
+</tbody>
+</table>
+<p>明细对账？我们也不要了！钱收到了就行！</p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>D 应收待清算</th>
+<th>C 商户待结算</th>
+<th>D 备付金头寸</th>
+<th>C 商户余额户</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>渠道扣款成功</td>
+<td>D + 5</td>
+<td>C + 5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>资金到账(完成资金对账)</td>
+<td>C - 5</td>
+<td></td>
+<td>D + 5</td>
+<td></td>
+</tr>
+<tr>
+<td>结算完成</td>
+<td></td>
+<td>D - 5</td>
+<td></td>
+<td>C + 5</td>
+</tr>
+</tbody>
+</table>
+<p>再简化就不礼貌了，也不现实了，但我们可以让它变得更抽象，更明显的表达状态机的思想：</p>
+<table>
+<thead>
+<tr>
+<th>Events</th>
+<th>D Account1</th>
+<th>C Account2</th>
+<th>D Position</th>
+<th>C Merchant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Init Event</td>
+<td>D + 5</td>
+<td>C + 5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Processing Event</td>
+<td>C - 5</td>
+<td></td>
+<td>D + 5</td>
+<td></td>
+</tr>
+<tr>
+<td>Final Event</td>
+<td></td>
+<td>D - 5</td>
+<td></td>
+<td>C + 5</td>
+</tr>
+</tbody>
+</table>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/dessert/" class="category-chain-item">dessert</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Finance/" class="print-no-link">#Finance</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「甜点」：复式记账法</div>
+      <div>https://kayce.world/dessert/double_entry_bookkeeping/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>kayce</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>December 16, 2024</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - Non-commercial">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - Share-alike">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/tech/rust_atomics_and_locks/" title="Rust Atomics and Locks">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Rust Atomics and Locks</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/chores/chores/" title="Chores">
+                        <span class="hidden-mobile">Chores</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"b25aa0a3d88c5fc4dbeb","clientSecret":"485e76d306112a519d43b4118efa8971c3ff6069","repo":"sshelll.github.io","owner":"sshelll","admin":["sshelll"],"language":"en-US","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'dcdc360a44a718b4b5bf6901079bb19d'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      <a>kayce</a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        Views: 
+        <span id="busuanzi_value_site_pv"></span>
+        
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        Visitors: 
+        <span id="busuanzi_value_site_uv"></span>
+        
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

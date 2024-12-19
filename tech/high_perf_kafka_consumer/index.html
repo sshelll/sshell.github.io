@@ -1,0 +1,1190 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/morty.jpeg">
+  <link rel="icon" href="/img/morty.jpeg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="kayce">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本文介绍了一种基于 Golang 的高性能 Kafka 消费模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一种高性能的 Kafka 消费模型">
+<meta property="og:url" content="https://kayce.world/tech/high_perf_kafka_consumer/index.html">
+<meta property="og:site_name" content="kayce">
+<meta property="og:description" content="本文介绍了一种基于 Golang 的高性能 Kafka 消费模型">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://kayce.world/img/kafka-go/kafka-go-sdk.png">
+<meta property="og:image" content="https://kayce.world/img/kafka-go/simple.png">
+<meta property="og:image" content="https://kayce.world/img/kafka-go/by_partition.png">
+<meta property="og:image" content="https://kayce.world/img/kafka-go/kafka-consumergroup.png">
+<meta property="article:published_time" content="2023-09-16T12:44:44.000Z">
+<meta property="article:modified_time" content="2024-12-15T07:12:00.000Z">
+<meta property="article:author" content="kayce">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="Kafka">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://kayce.world/img/kafka-go/kafka-go-sdk.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>一种高性能的 Kafka 消费模型 - kayce</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"kayce.world","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>kayce&#39;s world</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/music/" target="_self">
+                <i class="iconfont icon-music"></i>
+                <span>Music</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/RanchoNight_16_Tree.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="一种高性能的 Kafka 消费模型"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        kayce
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-09-16 20:44" pubdate>
+          September 16, 2023 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> views
+        </span>
+        
+
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">一种高性能的 Kafka 消费模型</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    Last updated on December 15, 2024 pm
+                  
+                
+              </p>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>Kafka 无疑是现在最流行的消息队列。</p>
+</blockquote>
+<h2 id="闲话">闲话</h2>
+<p>对于消息队列的选型，在国内环境中， RocketMQ 是一个强大的对手，网络上也有各种各样的对比和指导思想，有兴趣的读者可以自行搜索查看，在本文中并不会让这两者分个高下。</p>
+<p>网络上林林总总的文档中，比较有参考意义的是 Apache RocketMQ 官方文档中的对比：<a target="_blank" rel="noopener" href="https://rocketmq.apache.org/zh/docs/">Apache RocketMQ 5.0 中文文档</a>。</p>
+<p>可以看到，相比之下RocketMQ 是一个更为“现代化”的消息队列中间件，原生支持了 Kafka 不具备的许多功能，同时也对 Kafka 已有的功能做了一些补充和改进。同时，从文中也可以看到 RocketMQ 相比 Kafka 有着“低延时”和“高可用”的优点，但 Kafka 相比之下拥有更高的“吞吐量”。</p>
+<p>此外，官方文档中没有对两者的性能做出详细的说明，而阿里巴巴官方在外网发布了这篇文章作为补充：<a target="_blank" rel="noopener" href="https://alibaba-cloud.medium.com/kafka-vs-rocketmq-multiple-topic-stress-test-results-d27b8cbb360f">基于 Topic 数量的性能压测</a>。</p>
+<p>但是，就笔者的经验来说，在大部分实际的技术选型中，有以下三个“反直觉”的真相：</p>
+<ol>
+<li>许多细节上的差异并不会给项目带来明显的优势。举一个实际的例子来说：在绝大部分情况下，将接口响应时间从 10s 优化至 100ms，对比将响应时间从 100ms 优化至 1ms ，给用户带来的体感是完全不同的（后者远小于前者），同时付出的成本也是完全不同的（后者远大于前者）。</li>
+<li>社区活跃度的重要程度往往被我们轻视——当你遇见问题的时候，更活跃的社区往往能给你带来更短的定位 / 解决时间。这里是一个自带活跃度对比的外网社区的统计结果：<a target="_blank" rel="noopener" href="https://stackshare.io/stackups/kafka-vs-rocketmq">社区活跃度的对比</a>。从中可以看到，RocketMQ 在全球范围内的社区影响力远低于 Kafka。</li>
+<li>不同的公司的技术选型思路有巨大的差异。举例来说，我在字节跳动工作期间，公司内部所使用的云平台是自研的“字节云”。在字节云中，从 Golang 的镜像，到云服务器的 Linux 内核，都是公司自研的——根据公司的实际情况做出了相应的优化。当时在云平台的官方文档中，基础架构的同学写下了一段大致如下的描述：“强烈推荐各业务方从 Kafka / BMQ 切换到 RocketMQ，当前字节云中的 RocketMQ 中间件从各方位对比前者都有显著的优势” —— 有时候，只需要这样一句话，就能打消业务方几乎所有的疑问和顾虑（同时也解决了 2 中所描述的社区问题）。</li>
+</ol>
+<p>总的来说，所有技术选型都应该基于实际情况进行决策。就像 CAP 定理和“软件工程没有银弹”一样，世界上没有完美的解决方案，到底是否应该“以牺牲部分吞吐量为代价，来获得 RocketMQ 同步刷盘的能力”，还是“它们都太差了，我要自研一款属于我的 MQ”，是需要根据实际业务场景来决定的。</p>
+<p>而我现在所处的公司，在决策时面临的困难显然不那么强烈——我们使用亚马逊的 AWS 来部署服务，而 AWS 官方并没有提供基于 RocketMQ 的 Paas 服务，但 AWS MSK （Managed Streaming for Apache Kafka）已经相当成熟了，我们也就自然而然的选择了 Kafka 作为我们的消息队列，事实也证明，即便是和阿里一样同样置身在金融行业中，我们使用了所谓相比之下没有那么“高可靠、低延时”的 Kafka，也并没有给我们带来任何的困扰。</p>
+<h2 id="正文">正文</h2>
+<h3 id="基于-Golang-的-Kafka-SDK">基于 Golang 的 Kafka SDK</h3>
+<p>相同的中间件在不同编程语言中的实现的 SDK 必然是有差异的，它们往往会根据语言自身的特点做出相应的适配和优化。我所采用的 sdk 是 segmentio 公司研发的 <a target="_blank" rel="noopener" href="https://github.com/segmentio/kafka-go">kafka-go</a>，是 golang 中非常流行的一个库，也是适配得较好的一个库。</p>
+<p>这个库的实现原理大致如下：</p>
+<p><img src="/img/kafka-go/kafka-go-sdk.png" srcset="/img/loading.gif" lazyload alt="kafka-go sdk"></p>
+<ol>
+<li>kafka-go 会向 Kafka Broker 拉取一定数量的消息放入内存中的 msg chan（该 chan 的缓存大小是可配置的）</li>
+<li>然后应用程序通过调用 <code>FetchMessage</code> 方法来从这个 chan 中获取到一个消息并进行消费</li>
+<li>当消费成功后，应用程序通过调用 <code>CommitMessages</code> 方法来提交 commit request</li>
+<li>根据配置，kafka-go 会将 commit chan 中的请求立即提交，或将其 merge 合并为一个请求异步提交</li>
+</ol>
+<hr>
+<h3 id="简单的阻塞消费模型">简单的阻塞消费模型</h3>
+<p>最简单的消费模型其实和上面描述的过程是一致的，如下：</p>
+<p><img src="/img/kafka-go/simple.png" srcset="/img/loading.gif" lazyload alt="一次消费一条消息"></p>
+<p>当消费成功时直接提交；当消费失败时，根据需要进行无限重试，或是直接丢弃（提交 commit 请求视为成功）。</p>
+<p>常用 RocketMQ 的用户可以思考一下为什么我们一定要阻塞在某一条消息的处理上，为什么不能使用一个 <code>sync.WaitGroup</code> 来进行一定程度的并发呢？</p>
+<p>曾经我在字节工作期间使用 RocketMQ 时，确实是这么做的，就像在接到 HTTP 请求后开启协程来处理一样，在接到消息后也开启协程进行处理。但这是建立在 RocketMQ 本身是支持消息重试的基础上的，当 RocketMQ 消息消费失败后，我们可以显示地向 RocketMQ 提交一个 <code>NACK</code> 请求来表明消息处理失败了，此时消息会被 RocketMQ 丢入重试队列中等待二次消费，当失败次数达到阈值后，会被其放进死信队列中，消息永远是不会丢失的。</p>
+<p>但对于 Kafka 而言，它的提交行为是不区分 <code>ACK </code> / <code> NACK</code> 的，它的 commit 请求中只包含一个 <code>offset</code> 参数来标识当前消费者的消费进度。与此同时，kafka-go sdk 又在内存中将消息缓存到 chan 中，当我开启若干个协程调用 FetchMessage 方法时，获取到的消息是完全不同的。也就是说，当我开启三个协程处理三条消息时，可能分别在处理 offset = <code>1</code> / <code>2</code> / <code>3</code> 的 3 条消息，当 1 和 2 处理失败但 3 处理成功时，一旦将 3 commit 到 Kafka 中，1 和 2 就永久的丢失了（再也不会被消费了）。</p>
+<p>这种模型虽然很简单，但也十分低效，适合的场景也非常有限，举几个实际的例子：</p>
+<ol>
+<li>新增 / 注销账号产生的消息。类似的场景下消息产生的 QPS 很可能 &lt; 1，因此使用该模型并不会造成性能瓶颈，反而在一定程度上可以提升开发效率。</li>
+<li>需要使用顺序消费的场景。也就是说，在消费某条消息之前，必须消费完这条消息之前的所有消息，例如涉及到某些状态流转的场景，阶段 A 不能直接转换为阶段 C，而是必须经过阶段 B，此时我们需要顺序消费 A-&gt;B、B-&gt;C 这两条消息。</li>
+</ol>
+<hr>
+<h3 id="高性能的批量消费模型">高性能的批量消费模型</h3>
+<p>在 Kafka 不支持 <code>ACK</code> / <code>NACK</code> 的情况之下，如果我们仍需要保证消费的有序性，是不是就无法使用并发消费了呢？当然不是。接下来将介绍一种可配置、高并发的高性能消费模型：</p>
+<h4 id="以-Partition-为维度并发">以 Partition 为维度并发</h4>
+<p>熟悉 Kafka 架构的同学可能知道，Kafka 同一个 Topic 下的消息是分为多个 Partition 进行存储的，每个 Partition 中的消息都是按照投递的顺序进行排序的，也就是说，我们在消费同一个 Topic 的情况下，至少可以进行 Partition 维度的并发——就像在 RocketMQ 中，每个 Queue 中的消息是局部有序的。</p>
+<p><img src="/img/kafka-go/by_partition.png" srcset="/img/loading.gif" lazyload alt="根据 partition 并发处理"></p>
+<p>在这种模型中，我们需要做的主要有两件事：</p>
+<ol>
+<li>实现一个简单的 Dispatcher，根据 Kafka Message 的 Partition 进行分组后，将这条消息投入对应 Partition 的 chan 中</li>
+<li>实现一个通用的 Worker，用于处理 Partition Chan 中的消息</li>
+</ol>
+<p>以下是我写的一段核心代码：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> KafkaConsumer[T msgtype.KafkaMessage] <span class="hljs-keyword">struct</span> &#123;
+	callback           <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(msgs ...T)</span></span>
+	partitionMsgs      <span class="hljs-keyword">map</span>[<span class="hljs-type">int</span>]<span class="hljs-keyword">chan</span> T
+	partitionQueueSize <span class="hljs-type">int</span>
+
+	minBatchSize   <span class="hljs-type">int</span>
+	maxBatchSize   <span class="hljs-type">int</span>
+	forceFlushTime time.Duration
+
+	closeCh <span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *KafkaConsumer[T])</span></span> Run() &#123;
+	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		log.Info(<span class="hljs-string">&quot;kafka consumer started&quot;</span>)
+		<span class="hljs-keyword">for</span> &#123;
+			msg := c.fetchMsg()
+			<span class="hljs-comment">// 优雅退出</span>
+			<span class="hljs-keyword">select</span> &#123;
+			<span class="hljs-keyword">case</span> &lt;-c.closeCh:
+				log.Info(<span class="hljs-string">&quot;kafka consumer stopped&quot;</span>)
+				<span class="hljs-keyword">return</span>
+			<span class="hljs-keyword">default</span>:
+			&#125;
+			c.parallelHandle(msg)
+		&#125;
+	&#125;()
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *KafkaConsumer[T])</span></span> Stop() &#123;
+	<span class="hljs-built_in">close</span>(c.closeCh)
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *KafkaConsumer[T])</span></span> parallelHandle(msg T) &#123;
+	partition := msg.RawMessage().Partition
+
+	<span class="hljs-keyword">if</span> _, ok := c.partitionMsgs[partition]; !ok &#123;
+		c.startPartitionHandler(partition)
+	&#125;
+
+	c.partitionMsgs[partition] &lt;- msg
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *KafkaConsumer[T])</span></span> startPartitionHandler(partition <span class="hljs-type">int</span>) &#123;
+	<span class="hljs-comment">// 初始化分区消息队列</span>
+	c.partitionMsgs[partition] = <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> T, c.partitionQueueSize)
+
+	<span class="hljs-comment">// 启动分区消费者</span>
+	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+		flushTimer := time.NewTimer(c.forceFlushTime)
+
+		<span class="hljs-keyword">for</span> &#123;
+			msgBatch := <span class="hljs-built_in">make</span>([]T, <span class="hljs-number">0</span>, c.maxBatchSize)
+
+			<span class="hljs-comment">// 先取一条消息, 避免直接进入计时</span>
+			msgBatch = <span class="hljs-built_in">append</span>(msgBatch, &lt;-c.partitionMsgs[partition])
+			flushTimer.Reset(c.forceFlushTime)
+
+			<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;
+				<span class="hljs-keyword">for</span> <span class="hljs-built_in">len</span>(msgBatch) &lt; c.maxBatchSize &#123;
+					<span class="hljs-keyword">select</span> &#123;
+					<span class="hljs-comment">// 超时退出</span>
+					<span class="hljs-keyword">case</span> &lt;-flushTimer.C:
+						<span class="hljs-keyword">return</span>
+					<span class="hljs-comment">// 接收到新的 msg</span>
+					<span class="hljs-keyword">case</span> msg := &lt;-c.partitionMsgs[partition]:
+						msgBatch = <span class="hljs-built_in">append</span>(msgBatch, msg)
+					<span class="hljs-comment">// 暂时没有新的消息到来，但也尚未超时，此时缓存的消息若满足最小接收量则退出</span>
+					<span class="hljs-keyword">default</span>:
+						<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(msgBatch) &gt; c.minBatchSize &#123;
+							<span class="hljs-keyword">return</span>
+						&#125;
+						<span class="hljs-comment">// 再次 select, 避免空转</span>
+						<span class="hljs-keyword">select</span> &#123;
+						<span class="hljs-keyword">case</span> &lt;- flushTimer.C:
+							<span class="hljs-keyword">return</span>
+						<span class="hljs-keyword">case</span> msg := &lt;-c.partitionMsgs[partition]:
+							msgBatch = <span class="hljs-built_in">append</span>(msgBatch, msg)
+						&#125;
+					&#125;
+				&#125;
+			&#125;()
+
+			<span class="hljs-comment">// callback 中根据业务自行实现重试保证成功或是 drop</span>
+			c.callback(msgBatch...)
+			c.CommitMessages(msgBatch...)
+		&#125;
+	&#125;()
+&#125;</code></pre></div>
+<p>可以看到，在实际的代码实现中，会加入许多额外的细节来提供健壮性，其中使用了 <code>map[int]chan T</code> 结构来维护消息的分组过程，也就是实现了上述的 <code>Dispatcher</code>。除此之外，在 <code>startPartitionHandler(int)</code> 方法中，以异步的形式实现了前文中的<code>Worker</code>。</p>
+<p>在 Worker 的具体实现中，我使用了 3 个可配置的选项来根据实际情况动态的调控消费行为，分别是：</p>
+<ol>
+<li><code>forceFlushTime</code> ，每次处理消息前最大的循环时间——防止一直接收不到足量的消息而阻塞</li>
+<li><code>maxBatchSize</code>，每次批量处理消息的最大数量——防止一次性接收过多消息</li>
+<li><code>minBatchSize</code>，每次批量处理消息的最小数量——某些时候上游已经暂时不再产生消息，此时为了避免持续空转到超时，可以提前返回</li>
+</ol>
+<hr>
+<h4 id="从单条转向到批量处理消息">从单条转向到批量处理消息</h4>
+<p>从上面的 <code>KafkaConsumer</code> 中可以看到，我们对于消息的处理从单条转向了批量。在批量处理的过程中，我们需要保证所有消息都处理成功后（至少是业务上认为处理成功），再返回成功，常见的处理方式就是无限重试。在处理完一批消息之后，我们需要批量的提交消息，kafka-go 本身就提供了批量处理消息的函数，但是我们也需要进行一些合理的封装来实现如下功能：</p>
+<ol>
+<li>给 kafka 对应的 partition 提交 offset</li>
+<li>合理拆分消息数组，避免一次性提交的消息大小超过 kafka 的配置限额</li>
+<li>对 kafka 的连接进行合理的检测</li>
+</ol>
+<p>伪代码如下：</p>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> KafkaPartitionProducer[T msgtype.KafkaMessage] <span class="hljs-keyword">struct</span> &#123;
+	brokers   []<span class="hljs-type">string</span>
+	topic     <span class="hljs-type">string</span>
+	partition <span class="hljs-type">int</span>
+	conn      *kafka.Conn
+	codec     *kafka.CompressionCodec
+
+	logger *logrus.Entry
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(pp *KafkaPartitionProducer[T])</span></span> ProduceMust(msgs ...T) &#123;
+	<span class="hljs-keyword">if</span> pp.codec == <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;codec is nil&quot;</span>)
+	&#125;
+
+	<span class="hljs-keyword">if</span> pp.conn == <span class="hljs-literal">nil</span> &#123;
+		pp.connectMust()
+	&#125;
+
+	<span class="hljs-comment">// 构造 kafka 消息</span>
+	kmsgs := <span class="hljs-built_in">make</span>([]kafka.Message, <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(msgs))
+	<span class="hljs-keyword">for</span> _, msg := <span class="hljs-keyword">range</span> msgs &#123;
+		kmsg := pp.buildKafkaMessage(msg)
+		<span class="hljs-keyword">if</span> kmsg == <span class="hljs-literal">nil</span> &#123;
+			<span class="hljs-keyword">continue</span>
+		&#125;
+		kmsgs = <span class="hljs-built_in">append</span>(kmsgs, *kmsg)
+	&#125;
+
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(kmsgs) == <span class="hljs-number">0</span> &#123;
+		pp.logger.Warn(<span class="hljs-string">&quot;no messages to produce&quot;</span>)
+		<span class="hljs-keyword">return</span>
+	&#125;
+
+	<span class="hljs-comment">// 无限重试直到发送成功</span>
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; ; i++ &#123;
+		nbytes, _, offset, _, err := pp.conn.WriteCompressedMessagesAt(*pp.codec, kmsgs...)
+
+		<span class="hljs-keyword">if</span> err == <span class="hljs-literal">nil</span> &#123;
+			log.Infof(<span class="hljs-string">&quot;write compressed messages success&quot;</span>)
+			<span class="hljs-keyword">break</span>
+		&#125;
+
+		<span class="hljs-keyword">switch</span> err &#123;
+		<span class="hljs-keyword">case</span> kafka.MessageSizeTooLarge:
+			log.WithError(err).Errorf(<span class="hljs-string">&quot;kafka message size too large&quot;</span>)
+			<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(kmsgs) &lt;= <span class="hljs-number">1</span> &#123;
+				<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;kafka message size too large&quot;</span>)
+			&#125;
+			<span class="hljs-comment">// 消息过多对半递归重发</span>
+			mid := <span class="hljs-built_in">len</span>(kmsgs) / <span class="hljs-number">2</span>
+			pp.ProduceMust(msgs[:mid]...)
+			pp.ProduceMust(msgs[mid:]...)
+		<span class="hljs-keyword">default</span>:
+			<span class="hljs-comment">// 其它错误直接重连</span>
+			log.WithError(err).Errorf(<span class="hljs-string">&quot;failed to write compressed messages&quot;</span>)
+			pp.connectMust()
+		&#125;
+	&#125;
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(pp *KafkaPartitionProducer[T])</span></span> connect() <span class="hljs-type">error</span> &#123;
+	<span class="hljs-keyword">if</span> pp.conn != <span class="hljs-literal">nil</span> &#123;
+		pp.conn.Close()
+		pp.conn = <span class="hljs-literal">nil</span>
+	&#125;
+
+	<span class="hljs-keyword">for</span> _, addr := <span class="hljs-keyword">range</span> pp.brokers &#123;
+		log := pp.logger.WithField(<span class="hljs-string">&quot;addr&quot;</span>, addr)
+
+		ctx, canceler := context.WithTimeout(context.Background(), <span class="hljs-number">5</span>*time.Second)
+		<span class="hljs-keyword">defer</span> canceler()
+
+		<span class="hljs-comment">// 连接到指定 broker 的 topic / partition</span>
+		conn, err := kafka.DialLeader(ctx, <span class="hljs-string">&quot;tcp&quot;</span>, addr, pp.topic, pp.partition)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+			log.WithError(err).Errorf(<span class="hljs-string">&quot;failed to dial leader for partition&quot;</span>)
+			<span class="hljs-keyword">continue</span>
+		&#125;
+
+		<span class="hljs-comment">// 测试 kafka 连接是否正常</span>
+		first, err := conn.ReadFirstOffset()
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+			log.WithError(err).Error(<span class="hljs-string">&quot;failed to read first offset&quot;</span>)
+			conn.Close()
+			<span class="hljs-keyword">continue</span>
+		&#125;
+
+		last, err := conn.ReadLastOffset()
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+			log.WithError(err).Error(<span class="hljs-string">&quot;failed to read last offset&quot;</span>)
+			conn.Close()
+			<span class="hljs-keyword">continue</span>
+		&#125;
+
+		log.WithFields(logrus.Fields&#123;
+			<span class="hljs-string">&quot;first&quot;</span>: first,
+			<span class="hljs-string">&quot;last&quot;</span>:  last,
+		&#125;).Info(<span class="hljs-string">&quot;dial conn success&quot;</span>)
+
+		pp.conn = conn
+		<span class="hljs-keyword">break</span>
+	&#125;
+
+	<span class="hljs-comment">// 没有可用的 broker 连接</span>
+	<span class="hljs-keyword">if</span> pp.conn == <span class="hljs-literal">nil</span> &#123;
+		pp.logger.WithField(<span class="hljs-string">&quot;brokers&quot;</span>, pp.brokers).Error(<span class="hljs-string">&quot;failed to dial leader from all brokers&quot;</span>)
+		<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;failed to dial leader for partition %d&quot;</span>, pp.partition)
+	&#125;
+
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+&#125;</code></pre></div>
+<hr>
+<h4 id="消费过程的流水线">消费过程的流水线</h4>
+<p>考虑到 Kafka 的消费过程本质上也是一个不同流程的串联，于是我们可以在消费过程上进一步的进行优化。</p>
+<p>举例来说，我们的消费需要进行如下几个步骤：</p>
+<ol>
+<li>消息内容解析，例如有的消息里面包含紧凑的二进制数据，需要进行反序列化等操作才能被程序继续处理</li>
+<li>风控检查，拒绝掉不合理的消息</li>
+<li>日志记录，记录消息的来临</li>
+<li>业务处理，根据消息的内容进行业务处理</li>
+<li>落库，将消息的处理结果落库</li>
+</ol>
+<p>不难发现，其中可能有的步骤并不强烈依赖顺序处理，而有的步骤又需要。</p>
+<p>假设我们基于前面的消费模型构建了我们的应用，那么在合理配置 Kafka 的硬件和配置参数的情况下，瓶颈将很容易的出现在上面这个消费过程上。</p>
+<p>这里列举一个极简的优化方案：</p>
+<ul>
+<li>我们在每一步中都使用 golang 的 <code>chan</code> 进行解耦，比如 1 处理完之后通过 <code>chan</code> 传递给 2 继续处理。</li>
+<li>而前面的每一个数字序号，都是一个单独的 <code>goroutine</code>，仅仅通过 <code>chan</code> 来接收消息。</li>
+<li>然后对于首尾的两个环节进行特殊处理
+<ul>
+<li>首个环节需要接入 Kafka，真正的从 Kafka 中拉取消息</li>
+<li>末尾环节需要将处理结果落库后，向 Kafka 提交 offset</li>
+</ul>
+</li>
+</ul>
+<p>如此一来，我们便可以实现所谓: “业务处理第一条消息时，我们的程序已经开始解析并反序列化第二条消息了”。<br>
+于是我们在消费过程中的吞吐量将会得到极大的提升。</p>
+<p>当然，也有另外一种粗暴的方案，就是使用多个 <code>goroutine</code> 来批量消费一批消息，然后 <code>wg.Wait()</code> 等待所有消息处理完毕后再提交 offset。这种方案的优势在于实现简单，但是劣势在于无法保证消息的有序性，需要业务方自行保证消息的幂等性。</p>
+<h2 id="后话">后话</h2>
+<h3 id="Consumer-Group">Consumer Group</h3>
+<p>Kafka 的 Consumer Gourp 离不开 Rebalance 机制，所谓 Rebalance 指的就是将一个 Topic 下若干 Partition 通过协商的过程平均分配给同一个 Consumer Group 中不同 Consumer 的过程。也就是说，一个 Partition 只能被一个 Consumer Group 中的一个消费者消费，也就让我们可以容易的实现局部顺序消费，配合上 Producer 端的少许逻辑，就可以达成业务上的顺序性。</p>
+<p><img src="/img/kafka-go/kafka-consumergroup.png" srcset="/img/loading.gif" lazyload alt="consumer group 与 partition"></p>
+<p>在上图中，以订单的流转为例，只需要 Producer 在生产消息时根据订单 id 分配固定的 Partition 有序的发送消息（如对于订单221，将发起订单、流转订单、完成订单三个操作依次发送到 P1 中），下游的 Consumer 就能保证同一个订单的消息被按序处理，因为同一个 Partition 中的消息不会同时被两个 Consumer 消费。</p>
+<p>但是有些极端的情况仍可能导致重复消费的错误，例如 C1 在消费完「发起订单」后，还没来得及 Commit 就挂掉了，Rebalance 后 C2 或 C3 又会重新接收到该消息，并尝试再次发起订单，因此业务方自行保证消息消费的幂等性是十分有必要的。</p>
+<hr>
+<h3 id="Ack-Insync">Ack &amp;&amp; Insync</h3>
+<p><strong>Ack 的种类:</strong></p>
+<ul>
+<li><code>Ack = 0</code>，producer 不需要等待任何 broker 确认收到消息的回复</li>
+<li><code>Ack = 1</code>，producer 只需要等待 leader broker 确认收到消息的回复</li>
+<li><code>Ack = all</code>，producer 需要等待所有 min.insync.replicas 确认收到消息的回复</li>
+</ul>
+<p><strong>Insync:</strong><br>
+in-sync replicas (ISR) 是指能够与主节点保持同步的副本集合。这些副本需要持续跟踪主节点上的最新写入消息，并将其应用到自己的日志中。</p>
+<p>为了避免消息写入消息后，主节点立即宕机导致的消息丢失问题，我们一般会配置 <code>min.insync.replicas</code> 参数，然后协同使用 <code>Ack = all</code> 来保证消息写入多个节点才确认。</p>
+<p><strong>配置思路:</strong></p>
+<p>$$<br>
+replication\ factor=min.insync.replicas+N<br>
+$$</p>
+<p>上述公式能够保证我们在 N 个节点宕机的情况下，仍然能够保证系统的可用性。</p>
+<p>举例来说，假设我们需要让某个 topic 的消息至少被 3 个节点保存（一主两从），此时我们能够接受一个（主）节点宕机，那么 <code>min.insync.replicas</code> 为 2。<br>
+这也就是我之前在加密货币交易所的交易系统团队工作时，内部默认的配置。（这里再次提醒，我们需要使用 <code>Ack = all</code> 才能与上述配置协同工作保证消息可靠）。</p>
+<p><strong>抄答案:</strong></p>
+<table>
+<thead>
+<tr>
+<th>configuration item</th>
+<th>value</th>
+<th>type</th>
+<th>explain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unclean.leader.election.enable</td>
+<td>false</td>
+<td>brokers</td>
+<td>disallow unclean leader election</td>
+</tr>
+<tr>
+<td>replication factor</td>
+<td>3</td>
+<td>topic</td>
+<td>we need to have at least 3 replicas</td>
+</tr>
+<tr>
+<td>min.insync.replicas</td>
+<td>2</td>
+<td>topic</td>
+<td>we need to have at least 2 in-sync replicas</td>
+</tr>
+<tr>
+<td>ack</td>
+<td>all</td>
+<td>producer</td>
+<td>we need to wait for all in-sync replicas to acknowledge the message</td>
+</tr>
+<tr>
+<td>block.on.buffer.full</td>
+<td>true</td>
+<td>producer</td>
+<td>we need to block when the buffer is full</td>
+</tr>
+<tr>
+<td>broker cnt</td>
+<td>4</td>
+<td>brokers</td>
+<td>we need to deploy 4 brokers</td>
+</tr>
+</tbody>
+</table>
+<p><strong>吞吐量 vs 延迟:</strong></p>
+<blockquote>
+<p>除上述之外，还有部分用于提升 Kafka 消费吞吐量的配置（注意，提升吞吐量的同时往往都会造成延迟的增加，请根据业务选择）</p>
+</blockquote>
+<ul>
+<li>producer
+<ul>
+<li><code>linger.ms</code>, default 0, 消息在缓冲区中的停留时间, 增大该值可以等待更多消息加入批次，提高吞吐量，但也会增加延迟。</li>
+<li><code>batch.size</code>, default 16KB, 一次批量发送消息的大小, 增大该值可以减少网络开销，提高吞吐量，但也会增加延迟。</li>
+<li><code>buffer.memory</code>, 生产者本地缓冲区大小, 用于存储待发送的消息。适当增大可以提高吞吐量，但过大会增加内存使用风险。</li>
+</ul>
+</li>
+<li>broker
+<ul>
+<li><code>socket.send.buffer.bytes / socket.receive.buffer.bytes</code>, 控制生产者与代理、代理与消费者之间的网络缓冲区大小（默认值 100 KB）。</li>
+<li><code>log.segment.bytes</code>, 日志分段文件大小。适当增大可以减少文件数量，提高磁盘写入性能，但也会增加延迟。</li>
+<li><code>log.buffer.size</code>, Kafka 日志文件缓存大小，与底层 I/O 性能相关。</li>
+</ul>
+</li>
+<li>consumer
+<ul>
+<li><code>fetch.min.bytes / fetch.max.bytes</code>, 定义消费者每次拉取的最小/最大数据量，增大可以减少请求次数，提高吞吐量。</li>
+</ul>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/tech/" class="category-chain-item">tech</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Golang/" class="print-no-link">#Golang</a>
+      
+        <a href="/tags/Kafka/" class="print-no-link">#Kafka</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>一种高性能的 Kafka 消费模型</div>
+      <div>https://kayce.world/tech/high_perf_kafka_consumer/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>kayce</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>September 16, 2023</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Updated on</div>
+          <div>December 15, 2024</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - Non-commercial">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - Share-alike">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/tech/aws_kms_and_secret_mgr/" title="漫画图解 AWS KMS 与 AWS Secret Manager 的集成">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">漫画图解 AWS KMS 与 AWS Secret Manager 的集成</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/career/career_2023/" title="Career 2023">
+                        <span class="hidden-mobile">Career 2023</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"b25aa0a3d88c5fc4dbeb","clientSecret":"485e76d306112a519d43b4118efa8971c3ff6069","repo":"sshelll.github.io","owner":"sshelll","admin":["sshelll"],"language":"en-US","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '46b78b478f3b3053a91c18ce782c2bfe'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      <a>kayce</a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        Views: 
+        <span id="busuanzi_value_site_pv"></span>
+        
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        Visitors: 
+        <span id="busuanzi_value_site_uv"></span>
+        
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
