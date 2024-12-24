@@ -19,29 +19,25 @@
   <meta name="author" content="kayce">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Chores, chores, chores...">
+    <meta name="description" content="Easily convert recursion to iteration within 3 steps">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Chores">
-<meta property="og:url" content="https://kayce.world/chores/chores/index.html">
+<meta property="og:title" content="Recursion to Iteration">
+<meta property="og:url" content="https://kayce.world/tech/recur_to_iter/index.html">
 <meta property="og:site_name" content="kayce">
-<meta property="og:description" content="Chores, chores, chores...">
+<meta property="og:description" content="Easily convert recursion to iteration within 3 steps">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://kayce.world/img/chores/donations_for_the_markview_author.jpg">
-<meta property="og:image" content="https://kayce.world/img/chores/my_comment_for_markview_author.jpg">
-<meta property="og:image" content="https://kayce.world/img/chores/without_markview.jpg">
-<meta property="og:image" content="https://kayce.world/img/chores/with_markview.jpg">
-<meta property="article:published_time" content="2024-12-13T13:32:00.000Z">
-<meta property="article:modified_time" content="2024-12-13T13:32:00.000Z">
+<meta property="article:published_time" content="2024-12-20T14:59:55.000Z">
+<meta property="article:modified_time" content="2024-12-20T14:59:55.000Z">
 <meta property="article:author" content="kayce">
-<meta property="article:tag" content="Chores">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="Rust">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://kayce.world/img/chores/donations_for_the_markview_author.jpg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>Chores - kayce</title>
+  <title>Recursion to Iteration - kayce</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -234,7 +230,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Chores"></span>
+            <span id="subtitle" data-typed-text="Recursion to Iteration"></span>
           
         </div>
 
@@ -250,8 +246,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-13 21:32" pubdate>
-          December 13, 2024 pm
+        <time datetime="2024-12-20 22:59" pubdate>
+          December 20, 2024 pm
         </time>
       </span>
     
@@ -303,34 +299,130 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Chores</h1>
+            <h1 id="seo-header">Recursion to Iteration</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="Stories">Stories</h2>
-<h3 id="Donate-a-laptop-for-a-child-in-Bangladesh-2024-12-13">Donate a laptop for a child in Bangladesh - 2024.12.13</h3>
-<p>I’ve been using <code>NeoVim</code> as my primary code editor for 3 years, and I found a plug called <code>markview.nvim</code> in the first half of 2024.</p>
-<p>This plug is a markdown previewer, and it’s very convenient for me to preview the markdown file I’m editing in real-time.</p>
+                <p>Normally, recursion is more readable and easier to understand than iteration. However, recursion can be less efficient than iteration because of the overhead of function calls and the stack. What’s more, some languages don’t optimize tail recursion, which can lead to stack overflow errors.</p>
+<div class="note note-primary">
+            <p>Luckily, we can always convert recursion to iteration.</p>
+          </div>
+<h2 id="Example-Generate-balanced-parentheses">Example: Generate balanced parentheses</h2>
 <blockquote>
-<p>Actually, this article is written in markdown, and I’m exactly using <code>markview.nvim</code> to edit it.</p>
+<p>Given <code>n</code> pairs of parentheses, write a function to generate all combinations of well-formed parentheses.<br>
+Such as, with <code>n = 3</code>, a solution set is:<br>
+<code>[&quot;((()))&quot;,&quot;(()())&quot;,&quot;(())()&quot;,&quot;()(())&quot;,&quot;()()()&quot;]</code></p>
 </blockquote>
-<p>Recently, I found the author of this plugin is a child from Bangladesh, and he completed all the development with his phone…</p>
-<p>In hence, someone suggested that we can donate a laptop to him.</p>
-<p><strong>See:</strong></p>
+<h3 id="Rust">Rust</h3>
+<h4 id="Recursion">Recursion</h4>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">balanced_parens</span>(n: <span class="hljs-type">u16</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">String</span>&gt; &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">res</span> = <span class="hljs-type">Vec</span>::<span class="hljs-title function_ invoke__">new</span>();
+    <span class="hljs-title function_ invoke__">balanced_parens0</span>(n, n, <span class="hljs-type">String</span>::<span class="hljs-title function_ invoke__">new</span>(), &amp;<span class="hljs-keyword">mut</span> res);
+    res
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">balanced_parens0</span>(l: <span class="hljs-type">u16</span>, r: <span class="hljs-type">u16</span>, s: <span class="hljs-type">String</span>, res: &amp;<span class="hljs-keyword">mut</span> <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">String</span>&gt;) &#123;
+    <span class="hljs-keyword">if</span> l + r == <span class="hljs-number">0</span> &#123;
+        res.<span class="hljs-title function_ invoke__">push</span>(s);
+        <span class="hljs-keyword">return</span>;
+    &#125;
+    <span class="hljs-keyword">if</span> l &gt; <span class="hljs-number">0</span> &#123;
+        <span class="hljs-title function_ invoke__">balanced_parens0</span>(l - <span class="hljs-number">1</span>, r, s.<span class="hljs-title function_ invoke__">clone</span>() + <span class="hljs-string">&quot;(&quot;</span>, res);
+    &#125;
+    <span class="hljs-keyword">if</span> r &gt; l &#123;
+        <span class="hljs-title function_ invoke__">balanced_parens0</span>(l, r - <span class="hljs-number">1</span>, s.<span class="hljs-title function_ invoke__">clone</span>() + <span class="hljs-string">&quot;)&quot;</span>, res);
+    &#125;
+&#125;</code></pre></div>
+<h4 id="Iteration">Iteration</h4>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">balanced_parens</span>(n: <span class="hljs-type">u16</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">String</span>&gt; &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">res</span> = <span class="hljs-type">Vec</span>::<span class="hljs-title function_ invoke__">new</span>();
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">stack</span> = <span class="hljs-built_in">vec!</span>[];
+    stack.<span class="hljs-title function_ invoke__">push</span>((n, n, <span class="hljs-type">String</span>::<span class="hljs-title function_ invoke__">new</span>()));
+    <span class="hljs-keyword">while</span> <span class="hljs-keyword">let</span> <span class="hljs-variable">Some</span>((l, r, s)) = stack.<span class="hljs-title function_ invoke__">pop</span>() &#123;
+        <span class="hljs-keyword">if</span> l + r == <span class="hljs-number">0</span> &#123;
+            res.<span class="hljs-title function_ invoke__">push</span>(s);
+            <span class="hljs-keyword">continue</span>;
+        &#125;
+        <span class="hljs-keyword">if</span> l &gt; <span class="hljs-number">0</span> &#123;
+            stack.<span class="hljs-title function_ invoke__">push</span>((l - <span class="hljs-number">1</span>, r, s.<span class="hljs-title function_ invoke__">clone</span>() + <span class="hljs-string">&quot;(&quot;</span>));
+        &#125;
+        <span class="hljs-keyword">if</span> r &gt; l &#123;
+            stack.<span class="hljs-title function_ invoke__">push</span>((l, r - <span class="hljs-number">1</span>, s.<span class="hljs-title function_ invoke__">clone</span>() + <span class="hljs-string">&quot;)&quot;</span>));
+        &#125;
+    &#125;
+    res
+&#125;</code></pre></div>
+<hr>
+<h3 id="Golang">Golang</h3>
+<h4 id="Recursion-2">Recursion</h4>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BalancedParens</span><span class="hljs-params">(n <span class="hljs-type">int</span>)</span></span> []<span class="hljs-type">string</span> &#123;
+	res := []<span class="hljs-type">string</span>&#123;&#125;
+	balancedParens(n, n, <span class="hljs-string">&quot;&quot;</span>, &amp;res)
+	<span class="hljs-keyword">return</span> res
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">balancedParens</span><span class="hljs-params">(l, r <span class="hljs-type">int</span>, s <span class="hljs-type">string</span>, res *[]<span class="hljs-type">string</span>)</span></span> &#123;
+	<span class="hljs-keyword">if</span> l == <span class="hljs-number">0</span> &amp;&amp; r == <span class="hljs-number">0</span> &#123;
+		*res = <span class="hljs-built_in">append</span>(*res, s)
+		<span class="hljs-keyword">return</span>
+	&#125;
+
+	<span class="hljs-keyword">if</span> l &gt; <span class="hljs-number">0</span> &#123;
+		balancedParens(l<span class="hljs-number">-1</span>, r, s+<span class="hljs-string">&quot;(&quot;</span>, res)
+	&#125;
+
+	<span class="hljs-keyword">if</span> r &gt; l &#123;
+		balancedParens(l, r<span class="hljs-number">-1</span>, s+<span class="hljs-string">&quot;)&quot;</span>, res)
+	&#125;
+&#125;</code></pre></div>
+<h4 id="Iteration-2">Iteration</h4>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> stackFrame <span class="hljs-keyword">struct</span> &#123;
+	l <span class="hljs-type">int</span>
+	r <span class="hljs-type">int</span>
+	s <span class="hljs-type">string</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BalancedParens</span><span class="hljs-params">(n <span class="hljs-type">int</span>)</span></span> []<span class="hljs-type">string</span> &#123;
+	res := []<span class="hljs-type">string</span>&#123;&#125;
+	stack := <span class="hljs-built_in">make</span>([]stackFrame, <span class="hljs-number">0</span>, n)
+	stack = <span class="hljs-built_in">append</span>(stack, stackFrame&#123;n, n, <span class="hljs-string">&quot;&quot;</span>&#125;)
+	<span class="hljs-keyword">for</span> <span class="hljs-built_in">len</span>(stack) &gt; <span class="hljs-number">0</span> &#123;
+		<span class="hljs-comment">// pop</span>
+		frame := stack[<span class="hljs-built_in">len</span>(stack)<span class="hljs-number">-1</span>]
+		stack = stack[:<span class="hljs-built_in">len</span>(stack)<span class="hljs-number">-1</span>]
+
+		<span class="hljs-keyword">if</span> frame.l == <span class="hljs-number">0</span> &amp;&amp; frame.r == <span class="hljs-number">0</span> &#123;
+			res = <span class="hljs-built_in">append</span>(res, frame.s)
+			<span class="hljs-keyword">continue</span>
+		&#125;
+
+		<span class="hljs-keyword">if</span> frame.l &gt; <span class="hljs-number">0</span> &#123;
+			stack = <span class="hljs-built_in">append</span>(stack, stackFrame&#123;frame.l - <span class="hljs-number">1</span>, frame.r, frame.s + <span class="hljs-string">&quot;(&quot;</span>&#125;)
+		&#125;
+
+		<span class="hljs-keyword">if</span> frame.r &gt; frame.l &#123;
+			stack = <span class="hljs-built_in">append</span>(stack, stackFrame&#123;frame.l, frame.r - <span class="hljs-number">1</span>, frame.s + <span class="hljs-string">&quot;)&quot;</span>&#125;)
+		&#125;
+	&#125;
+	<span class="hljs-keyword">return</span> res
+&#125;</code></pre></div>
+<h2 id="3-Steps-to-Convert">3 Steps to Convert</h2>
+<p>Let’s dissect what’s going on:</p>
+<ol>
+<li>Extract the <strong><code>arguments</code></strong> of the recursive function signature into a <strong><code>frame</code></strong> struct(or tuple, etc.)</li>
+<li>Make a stack and store the <strong><code>first</code></strong> frame with the arguments of the initial call to the recursive function</li>
+<li>Copy the code inside the recursive function to the iteration loop, and…
 <ul>
-<li><a target="_blank" rel="noopener" href="https://www.reddit.com/r/neovim/comments/1h7vhmg/bro_been_developing_his_2k_star_plugin_on_a/">Bro been developing his 2k star plugin on a freaking touch phone 🤯🤯🤯</a></li>
-<li><a target="_blank" rel="noopener" href="https://github.com/OXY2DEV/markview.nvim/issues/218">Thinkpad GoFundMe</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.reddit.com/r/neovim/comments/1hb5szp/please_help_me_raise_funds_for_a_laptop/?utm_source=share&amp;utm_medium=web3x&amp;utm_name=web3xcss&amp;utm_term=1&amp;utm_content=share_button">Please help me raise funds for a laptop</a></li>
-<li><a target="_blank" rel="noopener" href="https://hcb.hackclub.com/oxy2dev-laptop/transactions">Transparent ledger of donations</a></li>
+<li>replace the recursive <strong><code>call</code></strong> with <strong><code>pushing</code></strong> a new frame to the stack</li>
+<li>replace the <strong><code>return</code></strong> statement with <strong><code>continue</code></strong> to jump to the next iteration</li>
 </ul>
-<p><strong>Community’s response:</strong><br>
-<img src="/img/chores/donations_for_the_markview_author.jpg" srcset="/img/loading.gif" lazyload alt="Donations in 3 days"></p>
-<p><img src="/img/chores/my_comment_for_markview_author.jpg" srcset="/img/loading.gif" lazyload alt="My Comment"></p>
-<p><strong>markview.nvim</strong></p>
-<p><img src="/img/chores/without_markview.jpg" srcset="/img/loading.gif" lazyload alt="Without markview.nvim"></p>
-<p><img src="/img/chores/with_markview.jpg" srcset="/img/loading.gif" lazyload alt="With markview.nvim"></p>
-<p>What a touching and inspiring story!</p>
+</li>
+</ol>
+<div class="note note-primary">
+            <p>By following these steps, we can 100% convert any recursive function to an iterative one.</p>
+          </div>
+<p>Yes, the iterative code still has some space for optimization in some cases, such as reusing variables, etc. But the key point is to show you how to convert recursion to iteration.</p>
 
                 
               </div>
@@ -349,7 +441,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/chores/" class="category-chain-item">chores</a>
+  <a href="/categories/tech/" class="category-chain-item">tech</a>
   
   
 
@@ -364,7 +456,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Chores/" class="print-no-link">#Chores</a>
+        <a href="/tags/Golang/" class="print-no-link">#Golang</a>
+      
+        <a href="/tags/Rust/" class="print-no-link">#Rust</a>
       
     </div>
   
@@ -376,8 +470,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Chores</div>
-      <div>https://kayce.world/chores/chores/</div>
+      <div>Recursion to Iteration</div>
+      <div>https://kayce.world/tech/recur_to_iter/</div>
     </div>
     <div class="license-meta">
       
@@ -389,7 +483,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>December 13, 2024</div>
+          <div>December 20, 2024</div>
         </div>
       
       
@@ -433,18 +527,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/dessert/double_entry_bookkeeping/" title="「甜点」：复式记账法">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">「甜点」：复式记账法</span>
-                        <span class="visible-mobile">Previous</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/imagination/gods_currency/" title="「胡思乱想」：马克思的货币与神造的 BTC">
-                        <span class="hidden-mobile">「胡思乱想」：马克思的货币与神造的 BTC</span>
+                      <a href="/tech/rust_cross_compile_on_osx/" title="Rust Cross Compile on OSX">
+                        <span class="hidden-mobile">Rust Cross Compile on OSX</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -467,7 +555,7 @@
         var options = Object.assign(
           {"clientID":"b25aa0a3d88c5fc4dbeb","clientSecret":"485e76d306112a519d43b4118efa8971c3ff6069","repo":"sshelll.github.io","owner":"sshelll","admin":["sshelll"],"language":"en-US","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
           {
-            id: 'f3be6b77d772976d3d007e2db32bc5fb'
+            id: 'ec65af4c4b7650eb1e1767919daf1695'
           }
         )
         var gitalk = new Gitalk(options);
@@ -528,12 +616,6 @@
 
 
   
-
-
-  
-  
-
-
 
 
 
@@ -752,49 +834,6 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
-
-  
-      <script>
-        if (!window.MathJax) {
-          window.MathJax = {
-            tex    : {
-              inlineMath: { '[+]': [['$', '$']] }
-            },
-            loader : {
-              load: ['ui/lazy']
-            },
-            options: {
-              renderActions: {
-                insertedScript: [200, () => {
-                  document.querySelectorAll('mjx-container').forEach(node => {
-                    let target = node.parentNode;
-                    if (target.nodeName.toLowerCase() === 'li') {
-                      target.parentNode.classList.add('has-jax');
-                    }
-                  });
-                }, '', false]
-              }
-            }
-          };
-        } else {
-          MathJax.startup.document.state(0);
-          MathJax.texReset();
-          MathJax.typeset();
-          MathJax.typesetPromise();
-        }
-
-        Fluid.events.registerRefreshCallback(function() {
-          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
-            MathJax.startup.document.state(0);
-            MathJax.texReset();
-            MathJax.typeset();
-            MathJax.typesetPromise();
-          }
-        });
-      </script>
-    
-
-  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 

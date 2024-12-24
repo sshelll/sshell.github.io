@@ -31,7 +31,7 @@
 <meta property="og:image" content="https://kayce.world/img/kafka-go/by_partition.png">
 <meta property="og:image" content="https://kayce.world/img/kafka-go/kafka-consumergroup.png">
 <meta property="article:published_time" content="2023-09-16T12:44:44.000Z">
-<meta property="article:modified_time" content="2024-12-15T07:12:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T07:35:00.000Z">
 <meta property="article:author" content="kayce">
 <meta property="article:tag" content="Golang">
 <meta property="article:tag" content="Kafka">
@@ -76,11 +76,15 @@
 
 
 
+  
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_4789608_0mu4sl00qiuq.css">
+
+
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"kayce.world","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"kayce.world","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":false,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null},"gtag":null,"woyaola":null,"cnzz":null},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -90,6 +94,17 @@
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
   
+
+  
+
+  
+
+  
+
+  
+
+  
+
 
 
   
@@ -294,7 +309,7 @@
               <p id="updated-time" class="note note-info" style="">
                 
                   
-                    Last updated on December 15, 2024 pm
+                    Last updated on December 22, 2024 pm
                   
                 
               </p>
@@ -310,14 +325,14 @@
 <p>网络上林林总总的文档中，比较有参考意义的是 Apache RocketMQ 官方文档中的对比：<a target="_blank" rel="noopener" href="https://rocketmq.apache.org/zh/docs/">Apache RocketMQ 5.0 中文文档</a>。</p>
 <p>可以看到，相比之下RocketMQ 是一个更为“现代化”的消息队列中间件，原生支持了 Kafka 不具备的许多功能，同时也对 Kafka 已有的功能做了一些补充和改进。同时，从文中也可以看到 RocketMQ 相比 Kafka 有着“低延时”和“高可用”的优点，但 Kafka 相比之下拥有更高的“吞吐量”。</p>
 <p>此外，官方文档中没有对两者的性能做出详细的说明，而阿里巴巴官方在外网发布了这篇文章作为补充：<a target="_blank" rel="noopener" href="https://alibaba-cloud.medium.com/kafka-vs-rocketmq-multiple-topic-stress-test-results-d27b8cbb360f">基于 Topic 数量的性能压测</a>。</p>
-<p>但是，就笔者的经验来说，在大部分实际的技术选型中，有以下三个“反直觉”的真相：</p>
+<p>但是，就我的经验来说，在大部分实际的技术选型中，有以下三个“反直觉”的真相：</p>
 <ol>
 <li>许多细节上的差异并不会给项目带来明显的优势。举一个实际的例子来说：在绝大部分情况下，将接口响应时间从 10s 优化至 100ms，对比将响应时间从 100ms 优化至 1ms ，给用户带来的体感是完全不同的（后者远小于前者），同时付出的成本也是完全不同的（后者远大于前者）。</li>
 <li>社区活跃度的重要程度往往被我们轻视——当你遇见问题的时候，更活跃的社区往往能给你带来更短的定位 / 解决时间。这里是一个自带活跃度对比的外网社区的统计结果：<a target="_blank" rel="noopener" href="https://stackshare.io/stackups/kafka-vs-rocketmq">社区活跃度的对比</a>。从中可以看到，RocketMQ 在全球范围内的社区影响力远低于 Kafka。</li>
-<li>不同的公司的技术选型思路有巨大的差异。举例来说，我在字节跳动工作期间，公司内部所使用的云平台是自研的“字节云”。在字节云中，从 Golang 的镜像，到云服务器的 Linux 内核，都是公司自研的——根据公司的实际情况做出了相应的优化。当时在云平台的官方文档中，基础架构的同学写下了一段大致如下的描述：“强烈推荐各业务方从 Kafka / BMQ 切换到 RocketMQ，当前字节云中的 RocketMQ 中间件从各方位对比前者都有显著的优势” —— 有时候，只需要这样一句话，就能打消业务方几乎所有的疑问和顾虑（同时也解决了 2 中所描述的社区问题）。</li>
+<li>不同的公司的技术选型思路有巨大的差异。举例来说，我在字节跳动工作期间，公司内部所使用的云平台是自研的“字节云”。在字节云中，从 Golang 的镜像，到云服务器的 Linux 内核，都是公司自研的——根据公司的实际情况做出了相应的优化。当时在云平台的官方文档中，基础架构的同学写下了一段大致如下的描述：“强烈推荐各业务方从 Kafka / BMQ 切换到 RocketMQ，当前字节云中的 RocketMQ 中间件从各方位对比前者都有显著的优势” 。</li>
 </ol>
-<p>总的来说，所有技术选型都应该基于实际情况进行决策。就像 CAP 定理和“软件工程没有银弹”一样，世界上没有完美的解决方案，到底是否应该“以牺牲部分吞吐量为代价，来获得 RocketMQ 同步刷盘的能力”，还是“它们都太差了，我要自研一款属于我的 MQ”，是需要根据实际业务场景来决定的。</p>
-<p>而我现在所处的公司，在决策时面临的困难显然不那么强烈——我们使用亚马逊的 AWS 来部署服务，而 AWS 官方并没有提供基于 RocketMQ 的 Paas 服务，但 AWS MSK （Managed Streaming for Apache Kafka）已经相当成熟了，我们也就自然而然的选择了 Kafka 作为我们的消息队列，事实也证明，即便是和阿里一样同样置身在金融行业中，我们使用了所谓相比之下没有那么“高可靠、低延时”的 Kafka，也并没有给我们带来任何的困扰。</p>
+<p>总的来说，所有技术选型都应该基于实际情况进行决策，到底是否应该“以牺牲部分吞吐量为代价，来获得 RocketMQ 同步刷盘的能力”，还是“它们都太差了，我要自研一款属于我的 MQ”，是需要根据实际业务场景来决定的。</p>
+<p>而我现在所处的公司，在决策时面临的困难显然不那么强烈——我们使用亚马逊的 AWS 来部署服务，而 AWS 官方并没有提供基于 RocketMQ 的 Paas 服务，但 AWS MSK （Managed Streaming for Apache Kafka）已经相当成熟了，我们也就自然而然的选择了 Kafka 作为我们的消息队列中间件。</p>
 <h2 id="正文">正文</h2>
 <h3 id="基于-Golang-的-Kafka-SDK">基于 Golang 的 Kafka SDK</h3>
 <p>相同的中间件在不同编程语言中的实现的 SDK 必然是有差异的，它们往往会根据语言自身的特点做出相应的适配和优化。我所采用的 sdk 是 segmentio 公司研发的 <a target="_blank" rel="noopener" href="https://github.com/segmentio/kafka-go">kafka-go</a>，是 golang 中非常流行的一个库，也是适配得较好的一个库。</p>
@@ -334,9 +349,8 @@
 <p>最简单的消费模型其实和上面描述的过程是一致的，如下：</p>
 <p><img src="/img/kafka-go/simple.png" srcset="/img/loading.gif" lazyload alt="一次消费一条消息"></p>
 <p>当消费成功时直接提交；当消费失败时，根据需要进行无限重试，或是直接丢弃（提交 commit 请求视为成功）。</p>
-<p>常用 RocketMQ 的用户可以思考一下为什么我们一定要阻塞在某一条消息的处理上，为什么不能使用一个 <code>sync.WaitGroup</code> 来进行一定程度的并发呢？</p>
-<p>曾经我在字节工作期间使用 RocketMQ 时，确实是这么做的，就像在接到 HTTP 请求后开启协程来处理一样，在接到消息后也开启协程进行处理。但这是建立在 RocketMQ 本身是支持消息重试的基础上的，当 RocketMQ 消息消费失败后，我们可以显示地向 RocketMQ 提交一个 <code>NACK</code> 请求来表明消息处理失败了，此时消息会被 RocketMQ 丢入重试队列中等待二次消费，当失败次数达到阈值后，会被其放进死信队列中，消息永远是不会丢失的。</p>
-<p>但对于 Kafka 而言，它的提交行为是不区分 <code>ACK </code> / <code> NACK</code> 的，它的 commit 请求中只包含一个 <code>offset</code> 参数来标识当前消费者的消费进度。与此同时，kafka-go sdk 又在内存中将消息缓存到 chan 中，当我开启若干个协程调用 FetchMessage 方法时，获取到的消息是完全不同的。也就是说，当我开启三个协程处理三条消息时，可能分别在处理 offset = <code>1</code> / <code>2</code> / <code>3</code> 的 3 条消息，当 1 和 2 处理失败但 3 处理成功时，一旦将 3 commit 到 Kafka 中，1 和 2 就永久的丢失了（再也不会被消费了）。</p>
+<p>为什么我们一定要阻塞在某一条消息的处理上，为什么不能使用一个 <code>sync.WaitGroup</code> 来进行一定程度的并发呢？</p>
+<p>因为对于 Kafka 而言，它的提交行为是不区分 <code>ACK </code> / <code> NACK</code> 的，它的 commit 请求中只包含一个 <code>offset</code> 参数来标识当前消费者的消费进度。与此同时，kafka-go sdk 又在内存中将消息缓存到 chan 中，当我开启若干个协程调用 FetchMessage 方法时，获取到的消息是完全不同的。也就是说，当我开启三个协程处理三条消息时，可能分别在处理 offset = <code>1</code> / <code>2</code> / <code>3</code> 的 3 条消息，当 1 和 2 处理失败但 3 处理成功时，一旦将 3 commit 到 Kafka 中，1 和 2 就永久的丢失了（再也不会被消费了）。</p>
 <p>这种模型虽然很简单，但也十分低效，适合的场景也非常有限，举几个实际的例子：</p>
 <ol>
 <li>新增 / 注销账号产生的消息。类似的场景下消息产生的 QPS 很可能 &lt; 1，因此使用该模型并不会造成性能瓶颈，反而在一定程度上可以提升开发效率。</li>
@@ -344,9 +358,10 @@
 </ol>
 <hr>
 <h3 id="高性能的批量消费模型">高性能的批量消费模型</h3>
-<p>在 Kafka 不支持 <code>ACK</code> / <code>NACK</code> 的情况之下，如果我们仍需要保证消费的有序性，是不是就无法使用并发消费了呢？当然不是。接下来将介绍一种可配置、高并发的高性能消费模型：</p>
+<p>在 Kafka 不支持 <code>ACK</code> / <code>NACK</code> 的情况之下，如果我们仍需要保证消费的有序性，是不是就无法使用并发消费了呢？</p>
 <h4 id="以-Partition-为维度并发">以 Partition 为维度并发</h4>
-<p>熟悉 Kafka 架构的同学可能知道，Kafka 同一个 Topic 下的消息是分为多个 Partition 进行存储的，每个 Partition 中的消息都是按照投递的顺序进行排序的，也就是说，我们在消费同一个 Topic 的情况下，至少可以进行 Partition 维度的并发——就像在 RocketMQ 中，每个 Queue 中的消息是局部有序的。</p>
+<p>Kafka 同一个 Topic 下的消息是分为多个 Partition 进行存储的，每个 Partition 中的消息都是按照投递的顺序进行排序的，也就是说，我们在消费同一个 Topic 的情况下，至少可以进行 Partition 维度的并发——就像在 RocketMQ 中，每个 Queue 中的消息是局部有序的。</p>
+<p>因此，我们可以以 Partition 为维度进行并发消费。于此同时，我们还可以对于每个 Partition 都批量的拉取消息，然后进行批量的处理，但是需要消费方保证消息处理的幂等性，避免重复消费。</p>
 <p><img src="/img/kafka-go/by_partition.png" srcset="/img/loading.gif" lazyload alt="根据 partition 并发处理"></p>
 <p>在这种模型中，我们需要做的主要有两件事：</p>
 <ol>
@@ -451,13 +466,8 @@
 <li><code>minBatchSize</code>，每次批量处理消息的最小数量——某些时候上游已经暂时不再产生消息，此时为了避免持续空转到超时，可以提前返回</li>
 </ol>
 <hr>
-<h4 id="从单条转向到批量处理消息">从单条转向到批量处理消息</h4>
-<p>从上面的 <code>KafkaConsumer</code> 中可以看到，我们对于消息的处理从单条转向了批量。在批量处理的过程中，我们需要保证所有消息都处理成功后（至少是业务上认为处理成功），再返回成功，常见的处理方式就是无限重试。在处理完一批消息之后，我们需要批量的提交消息，kafka-go 本身就提供了批量处理消息的函数，但是我们也需要进行一些合理的封装来实现如下功能：</p>
-<ol>
-<li>给 kafka 对应的 partition 提交 offset</li>
-<li>合理拆分消息数组，避免一次性提交的消息大小超过 kafka 的配置限额</li>
-<li>对 kafka 的连接进行合理的检测</li>
-</ol>
+<h4 id="批量发送消息">批量发送消息</h4>
+<p>除了消费可以实现批量之外，生产也可以实现批量。</p>
 <p>伪代码如下：</p>
 <div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> KafkaPartitionProducer[T msgtype.KafkaMessage] <span class="hljs-keyword">struct</span> &#123;
 	brokers   []<span class="hljs-type">string</span>
@@ -571,6 +581,9 @@
 
 	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
 &#125;</code></pre></div>
+<div class="note note-light">
+            <p>值得一提的是，上面代码中的 <code>buildKafkaMessage</code> 可能会成为一个瓶颈点，比如我们的构造逻辑包含一些压缩或者 IO 密集的操作。</p><p>此时我们可以使用协程池并发构造，以提升生产的吞吐量。</p><p>除此之外，它还有可能成为对于 kafka broker 的压力点，比如假设我的消息消费逻辑是一个转发逻辑，从上游获取消息后进行处理再转发给下游 kafka，我们利用上一小节的 <code>KafkaConsumer</code> 进行消费会构造出 <code>Partition</code> 级别的并发，可能会导致下游 kafka 的压力过大。</p><p>此时我们可以使用 <code>chan</code> 进行解耦和限流，实现并发消费+串行生产的转发模型。</p>
+          </div>
 <hr>
 <h4 id="消费过程的流水线">消费过程的流水线</h4>
 <p>考虑到 Kafka 的消费过程本质上也是一个不同流程的串联，于是我们可以在消费过程上进一步的进行优化。</p>
@@ -762,7 +775,7 @@ $$</p>
       
         <div class="license-meta-item license-meta-date">
           <div>Updated on</div>
-          <div>December 15, 2024</div>
+          <div>December 22, 2024</div>
         </div>
       
       
