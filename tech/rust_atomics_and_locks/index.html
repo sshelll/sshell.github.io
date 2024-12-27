@@ -761,26 +761,26 @@ it might be better for the threads to repeatedly try to lock it without actually
 &#125;</code></pre></div>
 <hr>
 <h3 id="Use-Guard-to-auto-unlock">Use Guard to auto unlock</h3>
-<div class="code-wrapper"><pre><code class="hljs swift">pub <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Guard</span>&lt;&#x27;a, <span class="hljs-type">T</span>&gt; &#123;
-    lock: <span class="hljs-operator">&amp;</span>&#x27;a <span class="hljs-type">SpinLock</span>&lt;<span class="hljs-type">T</span>&gt;,
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Guard</span>&lt;<span class="hljs-symbol">&#x27;a</span>, T&gt; &#123;
+    lock: &amp;<span class="hljs-symbol">&#x27;a</span> SpinLock&lt;T&gt;,
 &#125;
 
-impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span class="hljs-operator">&gt;</span> <span class="hljs-type">Deref</span> <span class="hljs-keyword">for</span> <span class="hljs-type">Guard</span>&lt;&#x27;<span class="hljs-keyword">_</span>, <span class="hljs-type">T</span>&gt; &#123;
-    type <span class="hljs-type">Target</span> <span class="hljs-operator">=</span> <span class="hljs-type">T</span>;
-    fn deref(<span class="hljs-operator">&amp;</span><span class="hljs-keyword">self</span>) -&gt; <span class="hljs-operator">&amp;</span><span class="hljs-keyword">Self</span>::<span class="hljs-type">Target</span> &#123;
-        unsafe &#123; <span class="hljs-operator">&amp;*</span><span class="hljs-keyword">self</span>.lock.value &#125;
+<span class="hljs-keyword">impl</span>&lt;T&gt; Deref <span class="hljs-keyword">for</span> <span class="hljs-title class_">Guard</span>&lt;<span class="hljs-symbol">&#x27;_</span>, T&gt; &#123;
+    <span class="hljs-keyword">type</span> <span class="hljs-title class_">Target</span> = T;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">deref</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> &amp;<span class="hljs-keyword">Self</span>::Target &#123;
+        <span class="hljs-keyword">unsafe</span> &#123; &amp;*<span class="hljs-keyword">self</span>.lock.value &#125;
     &#125;
 &#125;
 
-impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span class="hljs-operator">&gt;</span> <span class="hljs-type">DerefMut</span> <span class="hljs-keyword">for</span> <span class="hljs-type">Guard</span>&lt;&#x27;<span class="hljs-keyword">_</span>, <span class="hljs-type">T</span>&gt; &#123;
-    fn deref_mut(<span class="hljs-operator">&amp;</span>mut <span class="hljs-keyword">self</span>) -&gt; <span class="hljs-operator">&amp;</span>mut <span class="hljs-keyword">Self</span>::<span class="hljs-type">Target</span> &#123;
-        unsafe &#123; <span class="hljs-operator">&amp;</span>mut <span class="hljs-operator">*</span><span class="hljs-keyword">self</span>.lock.value &#125;
+<span class="hljs-keyword">impl</span>&lt;T&gt; DerefMut <span class="hljs-keyword">for</span> <span class="hljs-title class_">Guard</span>&lt;<span class="hljs-symbol">&#x27;_</span>, T&gt; &#123;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">deref_mut</span>(&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> &amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">Self</span>::Target &#123;
+        <span class="hljs-keyword">unsafe</span> &#123; &amp;<span class="hljs-keyword">mut</span> *<span class="hljs-keyword">self</span>.lock.value &#125;
     &#125;
 &#125;
 
-impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span class="hljs-operator">&gt;</span> <span class="hljs-type">Drop</span> <span class="hljs-keyword">for</span> <span class="hljs-type">Guard</span>&lt;&#x27;<span class="hljs-keyword">_</span>, <span class="hljs-type">T</span>&gt; &#123;
-    fn drop(<span class="hljs-operator">&amp;</span>mut <span class="hljs-keyword">self</span>) &#123;
-        <span class="hljs-keyword">self</span>.lock.unlock();
+<span class="hljs-keyword">impl</span>&lt;T&gt; <span class="hljs-built_in">Drop</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">Guard</span>&lt;<span class="hljs-symbol">&#x27;_</span>, T&gt; &#123;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">drop</span>(&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">self</span>) &#123;
+        <span class="hljs-keyword">self</span>.lock.<span class="hljs-title function_ invoke__">unlock</span>();
     &#125;
 &#125;</code></pre></div>
 <p>Now let’s change the <code>lock</code> method to return a <code>Guard</code>:</p>
@@ -873,71 +873,71 @@ impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span
 <p>And that’s exactly how does the <code>fence</code> synchronizes-with the <code>store</code> in <code>unlock</code>.</p>
 <p>It’s a little bit verbose, but it’s a good way to understand how <code>fence</code> works.</p>
 <h2 id="Chan">Chan</h2>
-<div class="code-wrapper"><pre><code class="hljs swift">pub <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Channel</span>&lt;<span class="hljs-type">T</span>&gt; &#123;
-    message: <span class="hljs-type">UnsafeCell</span>&lt;<span class="hljs-type">MaybeUninit</span>&lt;<span class="hljs-type">T</span>&gt;&gt;,
-    ready: <span class="hljs-type">AtomicBool</span>,
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Channel</span>&lt;T&gt; &#123;
+    message: UnsafeCell&lt;MaybeUninit&lt;T&gt;&gt;,
+    ready: AtomicBool,
 &#125;
 
-unsafe impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span class="hljs-operator">&gt;</span> <span class="hljs-type">Sync</span> <span class="hljs-keyword">for</span> <span class="hljs-type">Channel</span>&lt;<span class="hljs-type">T</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-type">T</span>: <span class="hljs-type">Send</span> &#123;&#125;
+<span class="hljs-keyword">unsafe</span> <span class="hljs-keyword">impl</span>&lt;T&gt; <span class="hljs-built_in">Sync</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">Channel</span>&lt;T&gt; <span class="hljs-keyword">where</span> T: <span class="hljs-built_in">Send</span> &#123;&#125;
 
-pub <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Sender</span>&lt;&#x27;a, <span class="hljs-type">T</span>&gt; &#123;
-    channel: <span class="hljs-operator">&amp;</span>&#x27;a <span class="hljs-type">Channel</span>&lt;<span class="hljs-type">T</span>&gt;,
-    recv_thread: <span class="hljs-type">Thread</span>,
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Sender</span>&lt;<span class="hljs-symbol">&#x27;a</span>, T&gt; &#123;
+    channel: &amp;<span class="hljs-symbol">&#x27;a</span> Channel&lt;T&gt;,
+    recv_thread: Thread,
 &#125;
 
-pub <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Receiver</span>&lt;&#x27;a, <span class="hljs-type">T</span>&gt; &#123;
-    channel: <span class="hljs-operator">&amp;</span>&#x27;a <span class="hljs-type">Channel</span>&lt;<span class="hljs-type">T</span>&gt;,
-    _marker: std::marker::<span class="hljs-type">PhantomData</span>&lt;&amp;&#x27;a <span class="hljs-type">T</span>&gt;,
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Receiver</span>&lt;<span class="hljs-symbol">&#x27;a</span>, T&gt; &#123;
+    channel: &amp;<span class="hljs-symbol">&#x27;a</span> Channel&lt;T&gt;,
+    _marker: std::marker::PhantomData&lt;&amp;<span class="hljs-symbol">&#x27;a</span> T&gt;,
 &#125;
 
-impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span class="hljs-operator">&gt;</span> <span class="hljs-type">Channel</span>&lt;<span class="hljs-type">T</span>&gt; &#123;
-    pub const fn new() -&gt; <span class="hljs-keyword">Self</span> &#123;
+<span class="hljs-keyword">impl</span>&lt;T&gt; Channel&lt;T&gt; &#123;
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">new</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-keyword">Self</span> &#123;
         <span class="hljs-keyword">Self</span> &#123;
-            message: <span class="hljs-type">UnsafeCell</span>::new(MaybeUninit::uninit()),
-            ready: <span class="hljs-type">AtomicBool</span>::new(<span class="hljs-literal">false</span>),
+            message: UnsafeCell::<span class="hljs-title function_ invoke__">new</span>(MaybeUninit::<span class="hljs-title function_ invoke__">uninit</span>()),
+            ready: AtomicBool::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-literal">false</span>),
         &#125;
     &#125;
 
-    pub fn split(<span class="hljs-operator">&amp;</span>mut <span class="hljs-keyword">self</span>) -&gt; (<span class="hljs-type">Sender</span>&lt;<span class="hljs-type">T</span>&gt;, <span class="hljs-type">Receiver</span>&lt;<span class="hljs-type">T</span>&gt;) &#123;
-        <span class="hljs-operator">*</span><span class="hljs-keyword">self</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">Self</span>::new();
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">split</span>(&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> (Sender&lt;T&gt;, Receiver&lt;T&gt;) &#123;
+        *<span class="hljs-keyword">self</span> = <span class="hljs-keyword">Self</span>::<span class="hljs-title function_ invoke__">new</span>();
         (
-            <span class="hljs-type">Sender</span> &#123;
+            Sender &#123;
                 channel: <span class="hljs-keyword">self</span>,
-                recv_thread: thread::current(),
+                recv_thread: thread::<span class="hljs-title function_ invoke__">current</span>(),
             &#125;,
-            <span class="hljs-type">Receiver</span> &#123;
+            Receiver &#123;
                 channel: <span class="hljs-keyword">self</span>,
-                _marker: std::marker::<span class="hljs-type">PhantomData</span>,
+                _marker: std::marker::PhantomData,
             &#125;,
         )
     &#125;
 &#125;
 
-impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span class="hljs-operator">&gt;</span> <span class="hljs-type">Sender</span>&lt;&#x27;<span class="hljs-keyword">_</span>, <span class="hljs-type">T</span>&gt; &#123;
-    pub fn send(<span class="hljs-keyword">self</span>, message: <span class="hljs-type">T</span>) &#123;
-        unsafe &#123; (<span class="hljs-operator">*</span><span class="hljs-keyword">self</span>.channel.message.get()).write(message) &#125;;
-        <span class="hljs-keyword">self</span>.channel.ready.store(<span class="hljs-literal">true</span>, <span class="hljs-type">Release</span>);
-        <span class="hljs-keyword">self</span>.recv_thread.unpark();
+<span class="hljs-keyword">impl</span>&lt;T&gt; Sender&lt;<span class="hljs-symbol">&#x27;_</span>, T&gt; &#123;
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">send</span>(<span class="hljs-keyword">self</span>, message: T) &#123;
+        <span class="hljs-keyword">unsafe</span> &#123; (*<span class="hljs-keyword">self</span>.channel.message.<span class="hljs-title function_ invoke__">get</span>()).<span class="hljs-title function_ invoke__">write</span>(message) &#125;;
+        <span class="hljs-keyword">self</span>.channel.ready.<span class="hljs-title function_ invoke__">store</span>(<span class="hljs-literal">true</span>, Release);
+        <span class="hljs-keyword">self</span>.recv_thread.<span class="hljs-title function_ invoke__">unpark</span>();
     &#125;
 &#125;
 
-impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span class="hljs-operator">&gt;</span> <span class="hljs-type">Receiver</span>&lt;&#x27;<span class="hljs-keyword">_</span>, <span class="hljs-type">T</span>&gt; &#123;
-    pub fn is_ready(<span class="hljs-operator">&amp;</span><span class="hljs-keyword">self</span>) -&gt; bool &#123;
-        <span class="hljs-keyword">self</span>.channel.ready.load(<span class="hljs-type">Relaxed</span>)
+<span class="hljs-keyword">impl</span>&lt;T&gt; Receiver&lt;<span class="hljs-symbol">&#x27;_</span>, T&gt; &#123;
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">is_ready</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">bool</span> &#123;
+        <span class="hljs-keyword">self</span>.channel.ready.<span class="hljs-title function_ invoke__">load</span>(Relaxed)
     &#125;
 
-    pub fn receive(<span class="hljs-keyword">self</span>) -&gt; <span class="hljs-type">T</span> &#123;
-        <span class="hljs-keyword">while</span> <span class="hljs-operator">!</span><span class="hljs-keyword">self</span>.channel.ready.swap(<span class="hljs-literal">false</span>, <span class="hljs-type">Acquire</span>) &#123;
-            thread::park();
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">receive</span>(<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> T &#123;
+        <span class="hljs-keyword">while</span> !<span class="hljs-keyword">self</span>.channel.ready.<span class="hljs-title function_ invoke__">swap</span>(<span class="hljs-literal">false</span>, Acquire) &#123;
+            thread::<span class="hljs-title function_ invoke__">park</span>();
         &#125;
-        unsafe &#123; (<span class="hljs-operator">*</span><span class="hljs-keyword">self</span>.channel.message.get()).assume_init_read() &#125;
+        <span class="hljs-keyword">unsafe</span> &#123; (*<span class="hljs-keyword">self</span>.channel.message.<span class="hljs-title function_ invoke__">get</span>()).<span class="hljs-title function_ invoke__">assume_init_read</span>() &#125;
     &#125;
 &#125;
 
-impl<span class="hljs-operator">&lt;</span><span class="hljs-type">T</span><span class="hljs-operator">&gt;</span> <span class="hljs-type">Drop</span> <span class="hljs-keyword">for</span> <span class="hljs-type">Channel</span>&lt;<span class="hljs-type">T</span>&gt; &#123;
-    fn drop(<span class="hljs-operator">&amp;</span>mut <span class="hljs-keyword">self</span>) &#123;
-        <span class="hljs-keyword">if</span> <span class="hljs-operator">*</span><span class="hljs-keyword">self</span>.ready.get_mut() &#123;
-            unsafe &#123; <span class="hljs-keyword">self</span>.message.get_mut().assume_init_drop() &#125;
+<span class="hljs-keyword">impl</span>&lt;T&gt; <span class="hljs-built_in">Drop</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">Channel</span>&lt;T&gt; &#123;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">drop</span>(&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">self</span>) &#123;
+        <span class="hljs-keyword">if</span> *<span class="hljs-keyword">self</span>.ready.<span class="hljs-title function_ invoke__">get_mut</span>() &#123;
+            <span class="hljs-keyword">unsafe</span> &#123; <span class="hljs-keyword">self</span>.message.<span class="hljs-title function_ invoke__">get_mut</span>().<span class="hljs-title function_ invoke__">assume_init_drop</span>() &#125;
         &#125;
     &#125;
 &#125;</code></pre></div>
@@ -1108,10 +1108,58 @@ In hence, we can use <code>AcqRel</code> for that, however, only the final decre
     <span class="hljs-comment">/// The data. Dropped if there are only weak pointers left.</span>
     data: UnsafeCell&lt;ManuallyDrop&lt;T&gt;&gt;,
 &#125;</code></pre></div>
+<p>We’re not going to copy the code from the book, let’s just summarize the key points:</p>
+<ul>
+<li>Using giant numbers as a limit is feasible, in the usage scenario of <code>Arc</code>, there’re no operating systems that can handle <code>usize::MAX / 2</code> threads.</li>
+<li>The inner data is still accessible even if all the <code>Arc</code> instances are dropped, because the <code>Weak</code> is still holding the <code>ArcData</code>. However, nobody can access it outside of the <code>Arc</code> crate - since we only provide <code>upgrade</code> method, and it’ll return <code>None</code>.</li>
+<li><code>get_mut</code> returns <code>None</code> unless the <code>Arc</code> is the only one holding the data.</li>
+</ul>
+<p>Have a look at this example:</p>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-meta">#[cfg(test)]</span>
+<span class="hljs-keyword">mod</span> tests &#123;
+    <span class="hljs-keyword">use</span> std::thread::&#123;<span class="hljs-keyword">self</span>&#125;;
+
+    <span class="hljs-keyword">use</span> super::*;
+
+    <span class="hljs-meta">#[test]</span>
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">test_arc</span>() &#123;
+        thread::<span class="hljs-title function_ invoke__">scope</span>(|s| &#123;
+            <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">arc</span> = Arc::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-number">42</span>);
+            <span class="hljs-comment">// only one reference, so we can get_mut</span>
+            <span class="hljs-built_in">assert!</span>(Arc::<span class="hljs-title function_ invoke__">get_mut</span>(&amp;<span class="hljs-keyword">mut</span> arc).<span class="hljs-title function_ invoke__">is_some</span>());
+
+            <span class="hljs-keyword">let</span> <span class="hljs-variable">weak1</span> = Arc::<span class="hljs-title function_ invoke__">downgrade</span>(&amp;arc);
+            <span class="hljs-comment">// more than one reference, so we cannot get_mut</span>
+            <span class="hljs-built_in">assert!</span>(Arc::<span class="hljs-title function_ invoke__">get_mut</span>(&amp;<span class="hljs-keyword">mut</span> arc).<span class="hljs-title function_ invoke__">is_none</span>());
+
+            <span class="hljs-keyword">let</span> <span class="hljs-variable">t</span> = s.<span class="hljs-title function_ invoke__">spawn</span>(<span class="hljs-keyword">move</span> || &#123;
+                thread::<span class="hljs-title function_ invoke__">park</span>();
+
+                <span class="hljs-comment">// we cannot upgrade again</span>
+                <span class="hljs-built_in">assert!</span>(weak1.<span class="hljs-title function_ invoke__">upgrade</span>().<span class="hljs-title function_ invoke__">is_none</span>());
+
+                <span class="hljs-comment">// but the data is still there, it&#x27;s just not accessible outside of the crate</span>
+                <span class="hljs-keyword">let</span> <span class="hljs-variable">d</span> = weak1.<span class="hljs-title function_ invoke__">data</span>();
+                <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;arc refs: &#123;:?&#125;&quot;</span>, d.data_ref_count.<span class="hljs-title function_ invoke__">load</span>(Relaxed));
+                <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;weak refs: &#123;:?&#125;&quot;</span>, d.alloc_ref_count.<span class="hljs-title function_ invoke__">load</span>(Relaxed));
+                <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;data: &#123;:?&#125;&quot;</span>, <span class="hljs-keyword">unsafe</span> &#123; &amp;*d.data.<span class="hljs-title function_ invoke__">get</span>() &#125;);
+            &#125;);
+
+            <span class="hljs-comment">// wait until the Arc is dropped</span>
+            s.<span class="hljs-title function_ invoke__">spawn</span>(<span class="hljs-keyword">move</span> || &#123;
+                <span class="hljs-title function_ invoke__">drop</span>(arc);
+            &#125;)
+            .<span class="hljs-title function_ invoke__">join</span>()
+            .<span class="hljs-title function_ invoke__">unwrap</span>();
+
+            t.<span class="hljs-title function_ invoke__">thread</span>().<span class="hljs-title function_ invoke__">unpark</span>();
+        &#125;)
+    &#125;
+&#125;</code></pre></div>
 <h2 id="Extra-Primitives">Extra - Primitives</h2>
 <p>We’ve talked about <code>UnsafeCell</code> in the first chapter <a href="#Cell-RefCell">Cell, RefCell</a>, and we’ve seen more primitives in <a href="#Chan">Chan</a> and <a href="#Arc">Arc</a>. So it’s time to summarize them:</p>
 <h3 id="UnsafeCell">UnsafeCell</h3>
-<p>As we’ve mentioned before, <code>UnsafeCell</code> is the core primitive for interior mutability, and it’s the <span class="label label-warning">only</span> safe way to have mutable data behind a shared reference.</p>
+<p>As we’ve mentioned before, <code>UnsafeCell</code> is the core primitive for interior mutability, and it’s <u>the <span class="label label-warning">only</span> safe way to have mutable data behind a shared reference</u>.</p>
 <p>E.g:</p>
 <div style="display: flex; flex-direction: row; justify-content: space-between;">
   <div style="width: 49%;">
@@ -1180,11 +1228,9 @@ In hence, we can use <code>AcqRel</code> for that, however, only the final decre
 Check this out: <a target="_blank" rel="noopener" href="https://doc.rust-lang.org/error_codes/E0152.html">Error code E0152, #![no_std]</a></p>
 <hr>
 <h3 id="NonNull">NonNull</h3>
-<p>To be short, as the doc says:</p>
-<p><code>*mut T</code> but non-zero and <strong><em>covariant</em></strong>.</p>
-<ol>
-<li>non-zero <code>*mut T</code></li>
-</ol>
+<p>To be short, as the doc says: “<code>*mut T</code> but non-zero and <strong><em>covariant</em></strong>”.</p>
+<p>So we can use it if we’re sure that the pointer is not null, and we can use it to <u>bypass the safety check of <code>*mut T</code></u>.</p>
+<h4 id="non-zero-mut-T">non-zero *mut T</h4>
 <div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
     <span class="hljs-comment">// addr = 0x0</span>
     <span class="hljs-keyword">let</span> <span class="hljs-variable">nptr</span>: *<span class="hljs-keyword">mut</span> <span class="hljs-type">i32</span> = ptr::<span class="hljs-title function_ invoke__">null_mut</span>();
@@ -1205,42 +1251,49 @@ Check this out: <a target="_blank" rel="noopener" href="https://doc.rust-lang.or
 <div class="note note-light">
             <p><strong><em>Aside: assert_unsafe_precondition!</em></strong></p><p><code>NonNull::new_unchecked</code> uses this macro to check the null pointer.</p><p>As we know, <code>xxx_unchecked</code> is a common pattern in rust, and it’s always used to bypass the safety check to improve performance.</p><p>So why does <code>NonNull</code> still check the null pointer? The secret is:</p><p>“The check is enabled at runtime if debug assertions are enabled when the caller is monomorphized. In const-eval/Miri checks implemented with this macro for language UB are always ignored.”</p><p>So, this check is only enabled in debug mode.</p><p>BTW, do you know how to enable/disable the debug assertions? There’re 3 ways:</p><ul><li>put <code>RUSTFLAGS=&quot;-C debug-assertions=on&quot;</code> before <code>cargo build</code></li><li>add <code>debug-assertions = true</code> in the <code>Cargo.toml</code></li><li>by default, <code>cargo build --release</code> will disable the debug assertions</li></ul>
           </div>
-<ol start="2">
-<li>covariant</li>
-</ol>
+<hr>
+<h4 id="covariant">covariant</h4>
 <div class="note note-danger">
             <p>This is a quite complex and subtle concept, I recommend you to read this article in <em>Rustonomicon</em>: <u><a target="_blank" rel="noopener" href="https://doc.rust-lang.org/nomicon/subtyping.html">🔗Subtyping and Variance</a></u>.</p>
           </div>
 <p>Anyway, let’s have a quick look of <code>Variance</code> in rust:</p>
-<div class="code-wrapper"><pre><code class="hljs swift">fn debug<span class="hljs-operator">&lt;</span>&#x27;a<span class="hljs-operator">&gt;</span>(a: <span class="hljs-operator">&amp;</span>&#x27;a str, b: <span class="hljs-operator">&amp;</span>&#x27;a str) &#123;
-    println<span class="hljs-operator">!</span>(<span class="hljs-string">&quot;a = &#123;a:?&#125; b = &#123;b:?&#125;&quot;</span>);
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">debug</span>&lt;<span class="hljs-symbol">&#x27;a</span>&gt;(a: &amp;<span class="hljs-symbol">&#x27;a</span> <span class="hljs-type">str</span>, b: &amp;<span class="hljs-symbol">&#x27;a</span> <span class="hljs-type">str</span>) &#123;
+    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;a = &#123;a:?&#125; b = &#123;b:?&#125;&quot;</span>);
 &#125;</code></pre></div>
-<p>We can see that <code>a</code> and <code>b</code> have the same lifetime <code>'a</code>, right?<br>
-But does the <code>debug</code> function really acquires the same lifetime for <code>a</code> and <code>b</code>?<br>
-The answer is <strong><em>NO</em></strong>:</p>
-<div class="code-wrapper"><pre><code class="hljs swift">fn main() &#123;
-    <span class="hljs-keyword">let</span> hello: <span class="hljs-operator">&amp;</span>&#x27;<span class="hljs-keyword">static</span> str <span class="hljs-operator">=</span> <span class="hljs-string">&quot;hello&quot;</span>;
+<p>We can see that <code>a</code> and <code>b</code> have the same lifetime <code>'a</code>, but does the <code>debug</code> function really requires the same lifetime for <code>a</code> and <code>b</code>?</p>
+<p>The answer is <strong><em>NO</em></strong>:</p>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">hello</span>: &amp;<span class="hljs-symbol">&#x27;static</span> <span class="hljs-type">str</span> = <span class="hljs-string">&quot;hello&quot;</span>;
     &#123;
-        <span class="hljs-keyword">let</span> world <span class="hljs-operator">=</span> <span class="hljs-type">String</span>::from(<span class="hljs-string">&quot;world&quot;</span>);
-        <span class="hljs-keyword">let</span> world <span class="hljs-operator">=</span> <span class="hljs-operator">&amp;</span>world; <span class="hljs-comment">// &#x27;world has a shorter lifetime than &#x27;static</span>
-        debug(hello, world);
+        <span class="hljs-keyword">let</span> <span class="hljs-variable">world</span> = <span class="hljs-type">String</span>::<span class="hljs-title function_ invoke__">from</span>(<span class="hljs-string">&quot;world&quot;</span>);
+        <span class="hljs-keyword">let</span> <span class="hljs-variable">world</span> = &amp;world; <span class="hljs-comment">// &#x27;world has a shorter lifetime than &#x27;static</span>
+        <span class="hljs-title function_ invoke__">debug</span>(hello, world);
     &#125;
 &#125;</code></pre></div>
-<p><strong>Let’s break it without complicated concepts:</strong></p>
+<p><strong>Let’s break it down without complicated concepts:</strong></p>
 <ul>
 <li>assume there’re 2 lifetimes: <code>'long</code> and <code>'short</code></li>
 <li><code>'long</code>’s code scope completely covers <code>'short</code>’s code scope</li>
 </ul>
-<p>Then we can say that <code>'long</code> can be downgraded to <code>'short</code>.<br>
-In hence, <code>debug(hello, world)</code> is:<br>
-<code>debug&lt;'world&gt;('world hello, 'world world)</code><br>
-instead of<br>
-<code>debug&lt;'static&gt;('static hello, 'static world)</code>.</p>
-<p><strong>Now let’s find the concepts back:</strong><br>
-In the above example, <code>'static</code> is a <u><strong><em>SubType</em></strong></u> of <code>'world</code>, and in contrast, <code>'world</code> is a <u><strong><em>SuperType</em></strong></u> of <code>'static</code>.<br>
-It’s not hard to understand the naming - we can always cast a child class into a parent class in OO languages like Java.<br>
-So we can always cast a <u><strong><em>SubType</em></strong></u> into a <u><strong><em>SuperType</em></strong></u> in Rust.</p>
-<p>Let’s stop here, find more details in the <em>Rustonomicon</em>.</p>
+<p>Then we can say that <code>'long</code> can be downgraded to <code>'short</code>.</p>
+<div class="note note-info">
+            <p>In hence, <code>debug(hello, world)</code> is:</p><p><code>debug&lt;'world&gt;('world hello, 'world world)</code></p><p>instead of</p><p><code>debug&lt;'static&gt;('static hello, 'static world)</code>.</p>
+          </div>
+<p><strong>Now let’s find the concepts back:</strong></p>
+<ul>
+<li><code>'static</code> is a <u><strong><em>SubType</em></strong></u> of <code>'world</code></li>
+<li><code>'world</code> is a <u><strong><em>SuperType</em></strong></u> of <code>'static</code></li>
+</ul>
+<p>It’s not hard to understand the naming - we can always cast a child class into a parent class in OO languages like Java.</p>
+<p>So we can always cast a <u><strong><em>SubType</em></strong></u> into a <u><strong><em>SuperType</em></strong></u> in Rust.</p>
+<p><strong>Look back to <code>Variance</code>:</strong></p>
+<p>‘Variance’ is another concept for describing the relationship between lifetimes. And it has 3 sub-concepts:</p>
+<ul>
+<li><strong>Covariant</strong>: if <code>'a</code> is a subtype of <code>'b</code>, then <code>Foo&lt;'a&gt;</code> is a subtype of <code>Foo&lt;'b&gt;</code>.</li>
+<li><strong>Contravariant</strong>: if <code>'a</code> is a subtype of <code>'b</code>, then <code>Foo&lt;'b&gt;</code> is a subtype of <code>Foo&lt;'a&gt;</code>.</li>
+<li><strong>Invariant</strong>: if <code>'a</code> is a subtype of <code>'b</code>, then <code>Foo&lt;'a&gt;</code> and <code>Foo&lt;'b&gt;</code> are not related to the precondition.</li>
+</ul>
+<p>Let’s stop here, we can find more details in the book <em>Rustonomicon</em>.</p>
 <hr>
 <h3 id="MaybeUninit-TODO">MaybeUninit(TODO)</h3>
 <hr>

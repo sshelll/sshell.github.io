@@ -26,8 +26,8 @@
 <meta property="og:site_name" content="kayce">
 <meta property="og:description" content="Easily convert recursion to iteration within 3 steps">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-12-20T14:59:55.000Z">
-<meta property="article:modified_time" content="2024-12-20T14:59:55.000Z">
+<meta property="article:published_time" content="2024-12-20T14:59:00.000Z">
+<meta property="article:modified_time" content="2024-12-26T14:20:00.000Z">
 <meta property="article:author" content="kayce">
 <meta property="article:tag" content="Golang">
 <meta property="article:tag" content="Rust">
@@ -301,6 +301,14 @@
           <article class="post-content mx-auto">
             <h1 id="seo-header">Recursion to Iteration</h1>
             
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    Last updated on December 26, 2024 pm
+                  
+                
+              </p>
+            
             
               <div class="markdown-body">
                 
@@ -423,6 +431,95 @@ Such as, with <code>n = 3</code>, a solution set is:<br>
             <p>By following these steps, we can 100% convert any recursive function to an iterative one.</p>
           </div>
 <p>Yes, the iterative code still has some space for optimization in some cases, such as reusing variables, etc. But the key point is to show you how to convert recursion to iteration.</p>
+<h2 id="Another-Example-Flip-Tree">Another Example: Flip Tree</h2>
+<p>In this example, <code>go</code> is a lot easier to convert than <code>rust</code>, because the <code>Ownership</code> system in <code>rust</code> makes things more complicated.</p>
+<h3 id="Go">Go</h3>
+<div class="code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> TreeNode <span class="hljs-keyword">struct</span> &#123;
+	Val   <span class="hljs-type">int</span>
+	Left  *TreeNode
+	Right *TreeNode
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">flipTreeRecur</span><span class="hljs-params">(root *TreeNode)</span></span> *TreeNode &#123;
+	<span class="hljs-keyword">if</span> root == <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+	&#125;
+	root.Left, root.Right = right, left
+	left := flipTree(root.Left)
+	right := flipTree(root.Right)
+	<span class="hljs-keyword">return</span> root
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">flipTree</span><span class="hljs-params">(root *TreeNode)</span></span> *TreeNode &#123;
+	<span class="hljs-keyword">if</span> root == <span class="hljs-literal">nil</span> &#123;
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+	&#125;
+	stack := []*TreeNode&#123;root&#125;
+	<span class="hljs-keyword">for</span> <span class="hljs-built_in">len</span>(stack) &gt; <span class="hljs-number">0</span> &#123;
+		root := stack[<span class="hljs-built_in">len</span>(stack)<span class="hljs-number">-1</span>]
+		stack = stack[:<span class="hljs-built_in">len</span>(stack)<span class="hljs-number">-1</span>]
+		<span class="hljs-keyword">if</span> root.Left != <span class="hljs-literal">nil</span> &#123;
+			stack = <span class="hljs-built_in">append</span>(stack, root.Left)
+		&#125;
+		<span class="hljs-keyword">if</span> root.Right != <span class="hljs-literal">nil</span> &#123;
+			stack = <span class="hljs-built_in">append</span>(stack, root.Right)
+		&#125;
+		root.Left, root.Right = root.Right, root.Left
+	&#125;
+	<span class="hljs-keyword">return</span> root
+&#125;</code></pre></div>
+<hr>
+<h3 id="Rust-2">Rust</h3>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::cell::RefCell;
+<span class="hljs-keyword">use</span> std::rc::Rc;
+
+<span class="hljs-meta">#[derive(Debug, PartialEq, Eq)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">TreeNode</span> &#123;
+    <span class="hljs-keyword">pub</span> val: <span class="hljs-type">i32</span>,
+    <span class="hljs-keyword">pub</span> left: <span class="hljs-type">Option</span>&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+    <span class="hljs-keyword">pub</span> right: <span class="hljs-type">Option</span>&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;,
+&#125;
+
+<span class="hljs-keyword">impl</span> <span class="hljs-title class_">TreeNode</span> &#123;
+    <span class="hljs-meta">#[inline]</span>
+    <span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">new</span>(val: <span class="hljs-type">i32</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-keyword">Self</span> &#123;
+        TreeNode &#123;
+            val,
+            left: <span class="hljs-literal">None</span>,
+            right: <span class="hljs-literal">None</span>,
+        &#125;
+    &#125;
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">flip_tree_recur</span>(root: <span class="hljs-type">Option</span>&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Option</span>&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; &#123;
+    root.<span class="hljs-title function_ invoke__">as_ref</span>()?;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">root</span> = root.<span class="hljs-title function_ invoke__">unwrap</span>();
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">left</span> = root.<span class="hljs-title function_ invoke__">borrow_mut</span>().left.<span class="hljs-title function_ invoke__">take</span>();
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">right</span> = root.<span class="hljs-title function_ invoke__">borrow_mut</span>().right.<span class="hljs-title function_ invoke__">take</span>();
+    root.<span class="hljs-title function_ invoke__">borrow_mut</span>().left = <span class="hljs-title function_ invoke__">flip_tree_recur</span>(right);
+    root.<span class="hljs-title function_ invoke__">borrow_mut</span>().right = <span class="hljs-title function_ invoke__">flip_tree_recur</span>(left);
+    <span class="hljs-title function_ invoke__">Some</span>(root)
+&#125;
+
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">flip_tree_iter</span>(root: <span class="hljs-type">Option</span>&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt;) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">Option</span>&lt;Rc&lt;RefCell&lt;TreeNode&gt;&gt;&gt; &#123;
+    root.<span class="hljs-title function_ invoke__">as_ref</span>()?;
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">root</span> = root.<span class="hljs-title function_ invoke__">unwrap</span>();
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">stack</span> = <span class="hljs-built_in">vec!</span>[root.<span class="hljs-title function_ invoke__">clone</span>()];
+    <span class="hljs-keyword">while</span> <span class="hljs-keyword">let</span> <span class="hljs-variable">Some</span>(node) = stack.<span class="hljs-title function_ invoke__">pop</span>() &#123;
+        <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">node</span> = node.<span class="hljs-title function_ invoke__">borrow_mut</span>();
+        <span class="hljs-keyword">let</span> <span class="hljs-variable">left</span> = node.left.<span class="hljs-title function_ invoke__">take</span>();
+        <span class="hljs-keyword">let</span> <span class="hljs-variable">right</span> = node.right.<span class="hljs-title function_ invoke__">take</span>();
+        node.left = right;
+        node.right = left;
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> <span class="hljs-variable">Some</span>(left) = node.left.<span class="hljs-title function_ invoke__">as_ref</span>() &#123;
+            stack.<span class="hljs-title function_ invoke__">push</span>(left.<span class="hljs-title function_ invoke__">clone</span>());
+        &#125;
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> <span class="hljs-variable">Some</span>(right) = node.right.<span class="hljs-title function_ invoke__">as_ref</span>() &#123;
+            stack.<span class="hljs-title function_ invoke__">push</span>(right.<span class="hljs-title function_ invoke__">clone</span>());
+        &#125;
+    &#125;
+    <span class="hljs-title function_ invoke__">Some</span>(root)
+&#125;</code></pre></div>
 
                 
               </div>
@@ -487,6 +584,11 @@ Such as, with <code>n = 3</code>, a solution set is:<br>
         </div>
       
       
+        <div class="license-meta-item license-meta-date">
+          <div>Updated on</div>
+          <div>December 26, 2024</div>
+        </div>
+      
       
         <div class="license-meta-item">
           <div>Licensed under</div>
@@ -526,6 +628,12 @@ Such as, with <code>n = 3</code>, a solution set is:<br>
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/tech/signature_based_auth_arch/" title="基于签名的鉴权架构">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">基于签名的鉴权架构</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
