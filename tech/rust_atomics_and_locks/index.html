@@ -1229,7 +1229,7 @@ Check this out: <a target="_blank" rel="noopener" href="https://doc.rust-lang.or
 <hr>
 <h3 id="NonNull">NonNull</h3>
 <p>To be short, as the doc says: “<code>*mut T</code> but non-zero and <strong><em>covariant</em></strong>”.</p>
-<p>So we can use it if we’re sure that the pointer is not null, and we can use it to <u>bypass the safety check of <code>*mut T</code></u>.</p>
+<p>So we can use it if we’re sure that the pointer is not null, and we can use it to <u>bypass the safety check of <code>*mut T</code></u> to get better performance.</p>
 <h4 id="non-zero-mut-T">non-zero *mut T</h4>
 <div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
     <span class="hljs-comment">// addr = 0x0</span>
@@ -1295,9 +1295,83 @@ Check this out: <a target="_blank" rel="noopener" href="https://doc.rust-lang.or
 </ul>
 <p>Let’s stop here, we can find more details in the book <em>Rustonomicon</em>.</p>
 <hr>
-<h3 id="MaybeUninit-TODO">MaybeUninit(TODO)</h3>
+<h3 id="ManuallyDrop">ManuallyDrop</h3>
+<p>A wrapper to inhibit the compiler from automatically calling <code>T</code>’s destructor and it’s 0-cost.</p>
+<p>Take a look at the definition:</p>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-meta">#[stable(feature = <span class="hljs-string">&quot;manually_drop&quot;</span>, since = <span class="hljs-string">&quot;1.20.0&quot;</span>)]</span>
+<span class="hljs-meta">#[lang = <span class="hljs-string">&quot;manually_drop&quot;</span>]</span>
+<span class="hljs-meta">#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]</span>
+<span class="hljs-meta">#[repr(transparent)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">ManuallyDrop</span>&lt;T: ?<span class="hljs-built_in">Sized</span>&gt; &#123;
+    value: T,
+&#125;</code></pre></div>
+<p>This is a <code>lang item</code> and it’s <code>repr(transparent)</code>, so it’s just a wrapper of <code>T</code>, and the implementation is a plugin of the compiler.</p>
+<p>Using <code>ManuallyDrop</code> is quite simple:</p>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">DetectDrop</span>&lt;T: <span class="hljs-built_in">Debug</span>&gt; &#123;
+    value: T,
+&#125;
+
+<span class="hljs-keyword">impl</span>&lt;T: <span class="hljs-built_in">Debug</span>&gt; <span class="hljs-built_in">Drop</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">DetectDrop</span>&lt;T&gt; &#123;
+    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">drop</span>(&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">self</span>) &#123;
+        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Dropping DetectDrop with value: &#123;:?&#125;&quot;</span>, <span class="hljs-keyword">self</span>.value);
+    &#125;
+&#125;
+
+<span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+    <span class="hljs-comment">// immutable, use into_inner to take the value out and drop it</span>
+    <span class="hljs-keyword">let</span> <span class="hljs-variable">x</span> = ManuallyDrop::<span class="hljs-title function_ invoke__">new</span>(DetectDrop &#123; value: <span class="hljs-number">52</span> &#125;);
+    &#123;
+        <span class="hljs-keyword">let</span> <span class="hljs-variable">_</span> = ManuallyDrop::<span class="hljs-title function_ invoke__">into_inner</span>(x);
+    &#125;
+
+    <span class="hljs-comment">// mutable, use `drop` to drop the value</span>
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">y</span> = ManuallyDrop::<span class="hljs-title function_ invoke__">new</span>(DetectDrop &#123; value: <span class="hljs-number">99</span> &#125;);
+    <span class="hljs-keyword">unsafe</span> &#123;
+        ManuallyDrop::<span class="hljs-title function_ invoke__">drop</span>(&amp;<span class="hljs-keyword">mut</span> y);
+    &#125;
+&#125;</code></pre></div>
 <hr>
-<h3 id="ManuallyDrop-TODO">ManuallyDrop(TODO)</h3>
+<h3 id="MaybeUninit">MaybeUninit</h3>
+<p>A wrapper to represent an value which is probably uninitialized.</p>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-meta">#[stable(feature = <span class="hljs-string">&quot;maybe_uninit&quot;</span>, since = <span class="hljs-string">&quot;1.36.0&quot;</span>)]</span>
+<span class="hljs-meta">#[lang = <span class="hljs-string">&quot;maybe_uninit&quot;</span>]</span>
+<span class="hljs-meta">#[derive(Copy)]</span>
+<span class="hljs-meta">#[repr(transparent)]</span>
+<span class="hljs-keyword">pub</span> <span class="hljs-keyword">union</span> <span class="hljs-title class_">MaybeUninit</span>&lt;T&gt; &#123;
+    uninit: (),
+    value: ManuallyDrop&lt;T&gt;,
+&#125;</code></pre></div>
+<p>As we can see, it’s also a <code>lang item</code> and <code>repr(transparent)</code>, meanwhile it’s a wrapper of <code>ManuallyDrop&lt;T&gt;</code>.</p>
+<p>The design pattern is easy to understand:</p>
+<ul>
+<li>when you create an <code>uninit</code> value, it’s just a <code>()</code> and it’s safe to drop</li>
+<li>but when you assign a value to it, it’ll become a <code>ManuallyDrop&lt;T&gt;</code> so it’s unsafe to drop</li>
+</ul>
+<p>So what’s the purpose of <code>MaybeUninit</code>? Especially when we have <code>ManuallyDrop</code>?</p>
+<p>A typical use is lazy initializing:</p>
+<div class="code-wrapper"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">arr</span>: [MaybeUninit&lt;<span class="hljs-type">i32</span>&gt;; <span class="hljs-number">10000</span>] = <span class="hljs-keyword">unsafe</span> &#123; MaybeUninit::<span class="hljs-title function_ invoke__">uninit</span>().<span class="hljs-title function_ invoke__">assume_init</span>() &#125;;
+
+    <span class="hljs-keyword">for</span> <span class="hljs-variable">i</span> <span class="hljs-keyword">in</span> <span class="hljs-number">0</span>..<span class="hljs-number">100</span> &#123;
+        arr[i] = MaybeUninit::<span class="hljs-title function_ invoke__">new</span>(i <span class="hljs-keyword">as</span> <span class="hljs-type">i32</span>);
+    &#125;
+
+    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">sum</span> = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">for</span> <span class="hljs-variable">i</span> <span class="hljs-keyword">in</span> <span class="hljs-number">0</span>..<span class="hljs-number">100</span> &#123;
+        sum += <span class="hljs-keyword">unsafe</span> &#123; arr[i].<span class="hljs-title function_ invoke__">assume_init</span>() &#125;;
+    &#125;
+
+    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>, sum);
+&#125;</code></pre></div>
+<div class="note note-info">
+            <p>The cost of the array itself cannot be reduced, but the cost of element is optimized.</p><p>The example above is quite simple, what if we replace <code>i32</code> with a complex struct? – <u>We have to call <code>T::new()</code> for each element, and those ‘zero’ values don’t take zero cost.</u></p>
+          </div>
+<p>You may noticed that we can replace <code>MaybeUninit</code> with <code>Option</code> in this example, so what’s the difference?</p>
+<ul>
+<li><code>Option</code> is a <code>enum</code> and it’s a fat pointer, while <code>MaybeUninit</code> is zero-cost.</li>
+<li><code>Option</code> can tell you whether the value is initialized, but <code>MaybeUninit</code> cannot.<br>
+Which indicates that you as a programmer, are responsible for keeping track of it and never reading it if it’s uninitialized</li>
+</ul>
 
                 
               </div>
