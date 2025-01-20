@@ -31,7 +31,7 @@
 <meta property="article:modified_time" content="2023-09-18T16:24:30.000Z">
 <meta property="article:author" content="kayce">
 <meta property="article:tag" content="AWS">
-<meta property="article:tag" content="安全">
+<meta property="article:tag" content="Auth">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://kayce.world/img/comic_kms/comic.png">
   
@@ -50,6 +50,8 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
 
 
 
@@ -367,7 +369,7 @@
       
         <a href="/tags/AWS/" class="print-no-link">#AWS</a>
       
-        <a href="/tags/%E5%AE%89%E5%85%A8/" class="print-no-link">#安全</a>
+        <a href="/tags/Auth/" class="print-no-link">#Auth</a>
       
     </div>
   
@@ -540,7 +542,6 @@
 
   
   
-
 
 
 
@@ -760,49 +761,6 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
-
-  
-      <script>
-        if (!window.MathJax) {
-          window.MathJax = {
-            tex    : {
-              inlineMath: { '[+]': [['$', '$']] }
-            },
-            loader : {
-              load: ['ui/lazy']
-            },
-            options: {
-              renderActions: {
-                insertedScript: [200, () => {
-                  document.querySelectorAll('mjx-container').forEach(node => {
-                    let target = node.parentNode;
-                    if (target.nodeName.toLowerCase() === 'li') {
-                      target.parentNode.classList.add('has-jax');
-                    }
-                  });
-                }, '', false]
-              }
-            }
-          };
-        } else {
-          MathJax.startup.document.state(0);
-          MathJax.texReset();
-          MathJax.typeset();
-          MathJax.typesetPromise();
-        }
-
-        Fluid.events.registerRefreshCallback(function() {
-          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
-            MathJax.startup.document.state(0);
-            MathJax.texReset();
-            MathJax.typeset();
-            MathJax.typesetPromise();
-          }
-        });
-      </script>
-    
-
-  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script  src="/js/local-search.js" ></script>
 

@@ -19,28 +19,24 @@
   <meta name="author" content="kayce">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Chores, chores, chores...">
+    <meta name="description" content="一种基于规则而非编码的权限系统实践">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Chores">
-<meta property="og:url" content="https://kayce.world/chores/chores/index.html">
+<meta property="og:title" content="基于规则的权限系统">
+<meta property="og:url" content="https://kayce.world/tech/rule_based_auth_sys/index.html">
 <meta property="og:site_name" content="kayce">
-<meta property="og:description" content="Chores, chores, chores...">
+<meta property="og:description" content="一种基于规则而非编码的权限系统实践">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://kayce.world/img/chores/donations_for_the_markview_author.jpg">
-<meta property="og:image" content="https://kayce.world/img/chores/my_comment_for_markview_author.jpg">
-<meta property="og:image" content="https://kayce.world/img/chores/without_markview.jpg">
-<meta property="og:image" content="https://kayce.world/img/chores/with_markview.jpg">
-<meta property="article:published_time" content="2024-12-13T13:32:00.000Z">
-<meta property="article:modified_time" content="2024-12-13T13:32:00.000Z">
+<meta property="article:published_time" content="2025-01-12T04:41:00.000Z">
+<meta property="article:modified_time" content="2025-01-20T02:13:17.184Z">
 <meta property="article:author" content="kayce">
+<meta property="article:tag" content="Auth">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://kayce.world/img/chores/donations_for_the_markview_author.jpg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>Chores - kayce</title>
+  <title>基于规则的权限系统 - kayce</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -51,8 +47,6 @@
   <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
 
 
 
@@ -235,7 +229,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Chores"></span>
+            <span id="subtitle" data-typed-text="基于规则的权限系统"></span>
           
         </div>
 
@@ -251,8 +245,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-13 21:32" pubdate>
-          December 13, 2024 pm
+        <time datetime="2025-01-12 12:41" pubdate>
+          January 12, 2025 pm
         </time>
       </span>
     
@@ -304,34 +298,329 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Chores</h1>
+            <h1 id="seo-header">基于规则的权限系统</h1>
+            
+              <p id="updated-time" class="note note-info" style="">
+                
+                  
+                    Last updated on January 20, 2025 am
+                  
+                
+              </p>
             
             
               <div class="markdown-body">
                 
-                <h2 id="Stories">Stories</h2>
-<h3 id="Donate-a-laptop-for-a-child-in-Bangladesh-2024-12-13">Donate a laptop for a child in Bangladesh - 2024.12.13</h3>
-<p>I’ve been using <code>NeoVim</code> as my primary code editor for 3 years, and I found a plug called <code>markview.nvim</code> in the first half of 2024.</p>
-<p>This plug is a markdown previewer, and it’s very convenient for me to preview the markdown file I’m editing in real-time.</p>
-<blockquote>
-<p>Actually, this article is written in markdown, and I’m exactly using <code>markview.nvim</code> to edit it.</p>
-</blockquote>
-<p>Recently, I found the author of this plugin is a child from Bangladesh, and he completed all the development with his phone…</p>
-<p>In hence, someone suggested that we can donate a laptop to him.</p>
-<p><strong>See:</strong></p>
+                <p>提到鉴权，我们往往会联想到基于 <code>Cookie-Session</code> / <code>Access Token</code> / <code>JWT</code> / <code>Siganature</code> 的方式，然而这些方式的解决的问题是在无状态的系统中进行用户身份识别从而达到有状态的目的的。</p>
+<p>然而在实际的业务场景中，我们还有一种更为复杂的权限需求，比如：</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://www.reddit.com/r/neovim/comments/1h7vhmg/bro_been_developing_his_2k_star_plugin_on_a/">Bro been developing his 2k star plugin on a freaking touch phone 🤯🤯🤯</a></li>
-<li><a target="_blank" rel="noopener" href="https://github.com/OXY2DEV/markview.nvim/issues/218">Thinkpad GoFundMe</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.reddit.com/r/neovim/comments/1hb5szp/please_help_me_raise_funds_for_a_laptop/?utm_source=share&amp;utm_medium=web3x&amp;utm_name=web3xcss&amp;utm_term=1&amp;utm_content=share_button">Please help me raise funds for a laptop</a></li>
-<li><a target="_blank" rel="noopener" href="https://hcb.hackclub.com/oxy2dev-laptop/transactions">Transparent ledger of donations</a></li>
+<li>A 用户可以查看所有用户的信息，B 则只能查看自己的信息</li>
+<li>A 有权修改系统内的数据，B 则只能查看</li>
 </ul>
-<p><strong>Community’s response:</strong><br>
-<img src="/img/chores/donations_for_the_markview_author.jpg" srcset="/img/loading.gif" lazyload alt="Donations in 3 days"></p>
-<p><img src="/img/chores/my_comment_for_markview_author.jpg" srcset="/img/loading.gif" lazyload alt="My Comment"></p>
-<p><strong>markview.nvim</strong></p>
-<p><img src="/img/chores/without_markview.jpg" srcset="/img/loading.gif" lazyload alt="Without markview.nvim"></p>
-<p><img src="/img/chores/with_markview.jpg" srcset="/img/loading.gif" lazyload alt="With markview.nvim"></p>
-<p>What a touching and inspiring story!</p>
+<p>这类场景更偏向 「鉴权」 而非 「认证」，因为它们更多的是在描述用户在系统中的行为权限而非身份。所以你可以称之为 <code>Access Control</code> or <code>Permission Control</code>。</p>
+<p>而在鉴权的场景下，一般有两种最佳实践：</p>
+<ol>
+<li>基于角色的权限控制（RBAC, Role-based access control）</li>
+<li>基于属性的权限控制（ABAC, Attribute-based access control）</li>
+</ol>
+<h2 id="RBAC">RBAC</h2>
+<p>RBAC 是一种基于角色的权限控制，它的核心思想是将用户分配到不同的角色，而角色拥有不同的权限。这种方式的优势在于简单易懂，易于维护，适用于中小型系统。</p>
+<p>比如我们可以定义三种角色：</p>
+<ul>
+<li>Admin</li>
+<li>User</li>
+<li>Guest</li>
+</ul>
+<p>对于不同的角色，我们可以定义不同的权限：</p>
+<ul>
+<li>Admin: CRUD</li>
+<li>User: CR</li>
+<li>Guest: R</li>
+</ul>
+<p>最后，我们赋予每个 User 不同的 Role：</p>
+<ul>
+<li>User A
+<ul>
+<li>Admin</li>
+</ul>
+</li>
+<li>User B
+<ul>
+<li>User</li>
+</ul>
+</li>
+<li>User C
+<ul>
+<li>Guest</li>
+</ul>
+</li>
+</ul>
+<p>然后我们可以“硬编码”我们想要的权限逻辑，然后在用户试图进行 CRUD 任意一种操作时，我们基于用户身份，找到其对应的角色，再根据角色的权限判断当前请求是否允许通过即可。</p>
+<pre><code class=" mermaid">classDiagram
+	class user&#123;
+		+int64 user_id
+	&#125;
+	class role&#123;
+		+int64 role_id
+		+String desc
+	&#125;
+	class user_role_ref&#123;
+		+int64 user_id
+		+int64 role_id
+	&#125;
+
+	user o--o user_role_ref
+  role o--o user_role_ref
+</code></pre>
+<p>鉴权方式类似于：<code>check_role(user)</code>。</p>
+<h2 id="ABAC">ABAC</h2>
+<p>简单来说，ABAC 的权限校验点相比于 RBAC 从 <code>Role</code> 转化为了 <code>Attribute</code>，从而让鉴权粒度更细了，并且组合起来更自由了。沿用上面的例子，我们可以使用 ABAC 实现如下：</p>
+<p>我们不再需要 Role 这个角色的定义，所有人都视为 User：</p>
+<ul>
+<li>User
+<ul>
+<li>User A</li>
+<li>User B</li>
+<li>User C</li>
+</ul>
+</li>
+</ul>
+<p>然后把 Role 具有的权限抽象为 <code>Attribute</code>：</p>
+<ul>
+<li>Attribute
+<ul>
+<li>Create</li>
+<li>Read</li>
+<li>Update</li>
+<li>Delete</li>
+</ul>
+</li>
+</ul>
+<p>最后赋予每个 User 不同的 Attribute：</p>
+<ul>
+<li>User A
+<ul>
+<li>Create + Read + Update + Delete</li>
+</ul>
+</li>
+<li>User B
+<ul>
+<li>Create + Read</li>
+</ul>
+</li>
+<li>User C
+<ul>
+<li>Read</li>
+</ul>
+</li>
+</ul>
+<p>鉴权方式类似于: <code>check_attribute(user_id, attribute)</code> 。</p>
+<div class="note note-light">
+            <p>事实上，k8s 中就可以使用 ABAC 来进行权限控制，参见：<a target="_blank" rel="noopener" href="https://kubernetes.io/zh-cn/docs/reference/access-authn-authz/abac/"><u>使用 ABAC 鉴权</u></a></p>
+          </div>
+<h2 id="R-A">R+A</h2>
+<p>在实际的业务场景中，我们往往会使用 RBAC 和 ABAC 的混合方式，因为 Attribute 的数量可能会非常多，因此直接管理 Attribute 的成本比较高，业务一般不会这么设计。</p>
+<p>通常来说，业务都会基于 R - A 的双层结构来进行不同粒度的权限管控，代入实际例子可以这么说：</p>
+<ul>
+<li>R：系统管理员可以访问某个 resource</li>
+<li>A：普通用户被授予访问该 resource 的权限后，虽然他不是管理员，但也可以访问</li>
+</ul>
+<p>这么做还有一个好处，就是方便用户进行快捷的权限管控，用户把某个员工设置为系统管理员，显然比用户把所有 Attribute 都添加到该员工头上来的简单。</p>
+<p>除此之外，我们一般可以使用 R 进行快速决策，当 R 无法满足时，再引入 A 进行复杂决策，这么做也可以提升鉴权本身的效率。</p>
+<p>总而言之，我们可以使用 Role 来进行基本的权限控制，然后使用 Attribute 来进行更细粒度的权限控制。</p>
+<h2 id="常见架构设计">常见架构设计</h2>
+<p><strong>1. 架构总体设计</strong></p>
+<p>鉴权系统可以分为以下几个核心模块：</p>
+<p><strong>1.1 数据层</strong></p>
+<p>用于存储用户、角色、权限、属性和规则。数据层需要保证高效查询和及时更新。</p>
+<ul>
+<li>
+<p><strong>用户数据</strong>：包含用户基本信息和关联的角色。</p>
+</li>
+<li>
+<p><strong>角色数据</strong>：存储角色与权限、属性的映射关系。</p>
+</li>
+<li>
+<p><strong>属性数据</strong>：存储 ABAC 中需要的用户属性、资源属性等信息。</p>
+</li>
+<li>
+<p><strong>规则存储</strong>：存储复杂场景下的规则，比如条件表达式或策略脚本。</p>
+</li>
+</ul>
+<p><strong>1.2 数据同步层</strong></p>
+<p>负责从各个业务系统同步数据（用户信息、角色、属性等）到鉴权系统。</p>
+<ul>
+<li>
+<p><strong>拉模式</strong>：定期从业务系统拉取更新（如使用 REST API 或消息队列）。</p>
+</li>
+<li>
+<p><strong>推模式</strong>：业务系统在数据变化时推送更新到鉴权系统。</p>
+</li>
+<li>
+<p><strong>缓存层</strong>：对于频繁访问的数据，可以使用内存缓存（如 Redis）以提升性能。</p>
+</li>
+</ul>
+<p><strong>1.3 鉴权核心</strong></p>
+<p>负责权限判断的核心模块。支持 RBAC 和 ABAC 的组合逻辑。</p>
+<ul>
+<li>
+<p><strong>RBAC 模块</strong>：通过用户关联的角色判断权限。</p>
+</li>
+<li>
+<p><strong>ABAC 模块</strong>：通过用户、资源的属性和规则判断权限。</p>
+</li>
+<li>
+<p><strong>规则引擎</strong>：支持动态规则匹配，可能使用 DSL 或标准语言（如 JSONLogic 或 Drools）。</p>
+</li>
+<li>
+<p><strong>决策引擎</strong>：综合 RBAC 和 ABAC 结果，根据优先级或策略作出最终鉴权决策。</p>
+</li>
+</ul>
+<p><strong>1.4 API 接口层</strong></p>
+<p>提供统一的鉴权接口供业务系统调用。</p>
+<ul>
+<li><strong>简单接口</strong>：例如 checkAttr(userId, attr)，用于快速校验简单场景。</li>
+<li><strong>复杂接口</strong>：例如 checkPermission(userId, action, resource)，支持复杂规则判断。</li>
+</ul>
+<p><strong>1.5 日志和审计</strong></p>
+<p>记录所有鉴权请求和结果，便于后续排查和分析。</p>
+<ul>
+<li><strong>日志存储</strong>：记录访问日志。</li>
+<li><strong>审计功能</strong>：提供接口供管理员查询权限决策过程。</li>
+</ul>
+<hr>
+<p><strong>2. 数据同步设计</strong></p>
+<p>鉴权系统需要构建一套机制，与各个业务系统同步数据：</p>
+<p><strong>2.1 数据源和 ETL</strong></p>
+<ul>
+<li>
+<p><strong>用户数据源</strong>：从用户管理系统同步用户信息。</p>
+</li>
+<li>
+<p><strong>角色数据源</strong>：从权限管理系统同步角色及权限。</p>
+</li>
+<li>
+<p><strong>属性数据源</strong>：从多个业务系统同步 ABAC 所需的属性（如用户部门、资源类型）。</p>
+</li>
+<li>
+<p><strong>ETL 管道</strong>：实现数据提取、清洗和加载到鉴权系统。</p>
+</li>
+</ul>
+<p><strong>2.2 数据实时性</strong></p>
+<p>对于属性变化可能影响权限的场景，需要实现实时同步或延迟最小化。</p>
+<ul>
+<li>
+<p>使用事件驱动架构（如 Kafka）捕获数据变化。</p>
+</li>
+<li>
+<p>增量更新而非全量同步。</p>
+</li>
+</ul>
+<p><strong>2.3 数据缓存</strong></p>
+<ul>
+<li>
+<p>对于高频访问的权限数据，可以使用 Redis 等缓存。</p>
+</li>
+<li>
+<p>缓存失效策略应与同步机制匹配，保证数据一致性。</p>
+</li>
+</ul>
+<hr>
+<p><strong>3. 规则引擎设计</strong></p>
+<p>复杂场景下，需要引入规则引擎来动态判断权限。</p>
+<p><strong>3.1 规则表达</strong></p>
+<p>规则可以用 DSL 或标准语言表示：</p>
+<ul>
+<li>
+<p><strong>DSL（领域特定语言）</strong>：如 <code>role == &quot;admin&quot; AND resource.type == &quot;file&quot; AND resource.owner == user.id</code></p>
+</li>
+<li>
+<p><strong>标准规则语言</strong>：如 JSONLogic、Drools 或 Open Policy Agent (OPA)。</p>
+</li>
+</ul>
+<p><strong>3.2 规则存储</strong></p>
+<ul>
+<li>
+<p>存储规则到数据库（如 PostgreSQL）。</p>
+</li>
+<li>
+<p>对复杂规则，可以用版本化管理，支持回滚。</p>
+</li>
+</ul>
+<p><strong>3.3 规则执行</strong></p>
+<ul>
+<li>
+<p><strong>RBAC 优先</strong>：先快速检查角色权限，减少不必要的规则计算。</p>
+</li>
+<li>
+<p><strong>ABAC 动态计算</strong>：根据规则动态计算属性权限。</p>
+</li>
+</ul>
+<p><strong>3.4 规则优化</strong></p>
+<ul>
+<li>使用缓存存储常用规则的结果。</li>
+<li>分析规则的覆盖范围，优化冗余规则。</li>
+</ul>
+<hr>
+<p><strong>4. API 接口层</strong></p>
+<p>提供对外访问接口，并确保性能与安全性。</p>
+<p><strong>4.1 简单接口</strong></p>
+<ul>
+<li>
+<p>checkAttr(userId, attr)：适用于 RBAC 和简单 ABAC 场景。</p>
+</li>
+<li>
+<p>快速校验是否具备某属性（如管理员身份）。</p>
+</li>
+</ul>
+<p><strong>4.2 复杂接口</strong></p>
+<ul>
+<li>
+<p>checkPermission(userId, action, resource)：综合用户角色和属性判断权限。</p>
+</li>
+<li>
+<p>支持返回详细的决策依据（如角色命中、规则匹配等）。</p>
+</li>
+</ul>
+<p><strong>4.3 批量接口</strong></p>
+<p>支持批量鉴权的接口（如批量检查多个资源的权限），提高效率。</p>
+<hr>
+<p><strong>5. 示例工作流</strong></p>
+<p>假设用户 user1 想访问资源 file123：</p>
+<ol>
+<li>
+<p>数据层查询 user1 的角色和属性，以及 file123 的属性。</p>
+</li>
+<li>
+<p>RBAC 模块判断用户是否具备相关角色权限。</p>
+</li>
+<li>
+<p>如果 RBAC 无法决定，则调用 ABAC 模块：</p>
+</li>
+</ol>
+<ul>
+<li>加载 user1 和 file123 的属性。</li>
+<li>加载相关规则并执行。</li>
+</ul>
+<ol start="4">
+<li>决策引擎综合 RBAC 和 ABAC 的结果，返回最终判断。</li>
+</ol>
+<hr>
+<p><strong>6. 扩展功能</strong></p>
+<ul>
+<li>
+<p><strong>动态更新规则</strong>：支持管理员实时更新规则，立即生效。</p>
+</li>
+<li>
+<p><strong>多租户支持</strong>：为不同业务系统提供隔离的鉴权规则和数据。</p>
+</li>
+<li>
+<p><strong>性能优化</strong>：分析高频鉴权请求，使用缓存或索引优化查询。</p>
+</li>
+</ul>
+<h2 id="实例">实例</h2>
+<p>这里有一个以我在飞书工作期间为灵感的一个鉴权原型服务, 这个 Demo 主要用于演示 / 验证 RBAC + ABAC 的结合, 并没有完整的工程实现, 例如目前并没有考虑 API 设计 / ETL 数据同步等。</p>
+<p>See: <a target="_blank" rel="noopener" href="https://github.com/sshelll/raac-demo">raac-demo</a></p>
 
                 
               </div>
@@ -350,7 +639,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/chores/" class="category-chain-item">chores</a>
+  <a href="/categories/tech/" class="category-chain-item">tech</a>
   
   
 
@@ -362,6 +651,13 @@
     </div>
   
   
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Auth/" class="print-no-link">#Auth</a>
+      
+    </div>
+  
 </div>
 
 
@@ -370,8 +666,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Chores</div>
-      <div>https://kayce.world/chores/chores/</div>
+      <div>基于规则的权限系统</div>
+      <div>https://kayce.world/tech/rule_based_auth_sys/</div>
     </div>
     <div class="license-meta">
       
@@ -383,9 +679,14 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>December 13, 2024</div>
+          <div>January 12, 2025</div>
         </div>
       
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Updated on</div>
+          <div>January 20, 2025</div>
+        </div>
       
       
         <div class="license-meta-item">
@@ -427,9 +728,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/chores/double_entry_bookkeeping/" title="复式记账法">
+                      <a href="/tech/signature_based_auth_arch/" title="基于签名的鉴权架构">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">复式记账法</span>
+                        <span class="hidden-mobile">基于签名的鉴权架构</span>
                         <span class="visible-mobile">Previous</span>
                       </a>
                     
@@ -437,8 +738,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/imagination/gods_currency/" title="「胡思乱想」：马克思的货币与神造的 BTC">
-                        <span class="hidden-mobile">「胡思乱想」：马克思的货币与神造的 BTC</span>
+                      <a href="/tech/backend_misc/" title="Backend Misc">
+                        <span class="hidden-mobile">Backend Misc</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -461,7 +762,7 @@
         var options = Object.assign(
           {"clientID":"b25aa0a3d88c5fc4dbeb","clientSecret":"485e76d306112a519d43b4118efa8971c3ff6069","repo":"sshelll.github.io","owner":"sshelll","admin":["sshelll"],"language":"en-US","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
           {
-            id: 'f3be6b77d772976d3d007e2db32bc5fb'
+            id: '39cf0beebae2999373729a6221c6979f'
           }
         )
         var gitalk = new Gitalk(options);
@@ -524,10 +825,20 @@
   
 
 
-  
-  
 
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
 
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
 
 
 

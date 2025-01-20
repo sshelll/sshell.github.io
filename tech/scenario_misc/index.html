@@ -19,24 +19,25 @@
   <meta name="author" content="kayce">
   <meta name="keywords" content="">
   
-    <meta name="description" content="从技术视角看待复式记账法">
+    <meta name="description" content="WIP FOREVER">
 <meta property="og:type" content="article">
-<meta property="og:title" content="复式记账法">
-<meta property="og:url" content="https://kayce.world/dessert/double_entry_bookkeeping/index.html">
+<meta property="og:title" content="Scenario Misc">
+<meta property="og:url" content="https://kayce.world/tech/scenario_misc/index.html">
 <meta property="og:site_name" content="kayce">
-<meta property="og:description" content="从技术视角看待复式记账法">
+<meta property="og:description" content="WIP FOREVER">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-12-16T14:41:53.000Z">
-<meta property="article:modified_time" content="2024-12-16T14:41:53.000Z">
+<meta property="article:published_time" content="2025-01-19T10:20:00.000Z">
+<meta property="article:modified_time" content="2025-01-19T10:20:00.000Z">
 <meta property="article:author" content="kayce">
-<meta property="article:tag" content="Finance">
+<meta property="article:tag" content="Backend">
+<meta property="article:tag" content="Misc">
 <meta name="twitter:card" content="summary_large_image">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>复式记账法 - kayce</title>
+  <title>Scenario Misc - kayce</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -229,7 +230,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="复式记账法"></span>
+            <span id="subtitle" data-typed-text="Scenario Misc"></span>
           
         </div>
 
@@ -245,8 +246,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-16 22:41" pubdate>
-          December 16, 2024 pm
+        <time datetime="2025-01-19 18:20" pubdate>
+          January 19, 2025 pm
         </time>
       </span>
     
@@ -298,284 +299,74 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">复式记账法</h1>
+            <h1 id="seo-header">Scenario Misc</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="核心点">核心点</h2>
-<ul>
-<li>有借必有贷，借贷必相等</li>
-<li>借 = debit，贷 = credit</li>
-</ul>
-<p>核心点不难理解，就是字面意思。只是注意不要陷入中文的语言陷阱中 —— 有人觉得&quot;找银行借钱和找银行贷款&quot;是同一个意思，于是就会搞混 debit 和 credit 的概念。</p>
-<p>你只需要记住&quot;贷 credit&quot;才是需要偿还的即可（类比你的房贷）。如果你希望让&quot;借&quot;的理解更合理，你可以理解为是你把钱借给了银行，因为钱是你的，而你放在银行那存着。</p>
-<h2 id="记账过程">记账过程</h2>
-<p>假设我使用某支付平台通过我的银行卡支付了 5 元购买了一瓶饮料，我的钱最终应该从我的账户流向商家的账户，理论上来说一个完备的记账流程大致如下：</p>
-<table>
-<thead>
-<tr>
-<th>事件</th>
-<th>D 应收待清算</th>
-<th>C 网关过渡户</th>
-<th>C 商户待结算</th>
-<th>D 应收应清算</th>
-<th>D 备付金头寸</th>
-<th>C 商户余额户</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>渠道扣款成功</td>
-<td>D + 5</td>
-<td>C + 5</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>支付成功</td>
-<td></td>
-<td>D - 5</td>
-<td>C + 5</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>网联清分完成(完成明细对账)</td>
-<td>C - 5</td>
-<td></td>
-<td></td>
-<td>D + 5</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>资金到账(完成资金对账)</td>
-<td></td>
-<td></td>
-<td></td>
-<td>C - 5</td>
-<td>D + 5</td>
-<td></td>
-</tr>
-<tr>
-<td>结算完成</td>
-<td></td>
-<td></td>
-<td>D - 5</td>
-<td></td>
-<td></td>
-<td>C + 5</td>
-</tr>
-</tbody>
-</table>
-<p>我们先不管上述复杂的流程，按照下面的步骤从易到难逐步理解。</p>
-<hr>
-<h3 id="一、事件">一、事件</h3>
-<p>事件的类型已经在上面标注出来了，你可以理解为这是行业内的通用实践，也可以理解为这是基于安全考量所必备的一些步骤。</p>
-<p>比如，理论上来说，平台给商家打款，也可以不关心外部的网联的对账：</p>
-
-    <div class="fold">
-      <div class="fold-title fold-default collapsed" data-toggle="collapse" href="#collapse-a9d83a35" role="button" aria-expanded="false" aria-controls="collapse-a9d83a35">
-        <div class="fold-arrow">▶</div>TL;DR
-      </div>
-      <div class="fold-collapse collapse" id="collapse-a9d83a35">
-        <div class="fold-content">
-          <p>假设我是「XX 支付」，用户的钱在我的系统里本质上只是一个数字，在不涉及出入金的情况下，我完全可以随意修改这个数字。<br>平台的零钱 / 余额只能在平台内流通，直到你点击「提现到银行卡」，这笔钱我才真正需要和银行结算。<br>因此用户付费购买商品这个流程，我可以直接把 user.balance - 5, merchant.balance + 5，然后告诉商家「你的钱到账了」。<br>我们之所以需要消费上述的具体事件来推进流程，是因为这笔钱的来源并不是平台内的用户零钱，而是用户的银行卡，也就是说用户选择了「使用银行卡支付」。<br>所以如果我主动跳过其中的核心检查步骤，直接给商户加钱，那么万一用户的银行卡扣款失败，那我作为平台就损失了 5 元。</p>
-        </div>
-      </div>
-    </div>
-<hr>
-<h3 id="二、C-D-的特征">二、C / D 的特征</h3>
-<p>复习一下：C = credit 贷记，D = debit 借记。</p>
-<p>我们不难发现上述表中有如下特征：</p>
-<ul>
+                <div class="note note-warning">
+            <p>WIP FOREVER!</p>
+          </div>
+<div class="note note-light">
+            <p>Glimpse of solutions.</p>
+          </div>
+<h2 id="ES-深分页">ES 深分页</h2>
+<p><strong>随机跳转问题</strong></p>
+<p>搜索结果列表页下方可能要支持跳转，这个功能可能会给 ES 带来性能问题，普遍没有很好的解决方案，需要结合业务做出限制和优化。</p>
+<ol>
 <li>
-<p>每一列的 C 和 D 的和都是 0（除了最后两列）</p>
-
-    <div class="fold">
-      <div class="fold-title fold-info collapsed" data-toggle="collapse" href="#collapse-ec4cc7c3" role="button" aria-expanded="false" aria-controls="collapse-ec4cc7c3">
-        <div class="fold-arrow">▶</div>解释
-      </div>
-      <div class="fold-collapse collapse" id="collapse-ec4cc7c3">
-        <div class="fold-content">
-          <p><u>每一列代表的都是某个独立账户的变动</u>，那么显然，除了最终的商户余额户和备付金头寸，其他账户的变动都是功能性的、短暂的。<br>换句话来说，钱只是经过这些账户流入了商户的钱包，这些账户在不收取手续费的情况下，不应该从中拿取或者给予任何金额。<br>为什么后两列不符合特征呢？因为商户通过卖饮料赚到了 5 元。</p>
-        </div>
-      </div>
-    </div>
+<p>from + size</p>
+<p>多 shard 查询之后在内存中排序后计算结果集。数据量大的时候性能很低。</p>
 </li>
 <li>
-<p>每一行的 C 和 D 的和都是 0（除了第一行）</p>
-
-    <div class="fold">
-      <div class="fold-title fold-info collapsed" data-toggle="collapse" href="#collapse-bb76695e" role="button" aria-expanded="false" aria-controls="collapse-bb76695e">
-        <div class="fold-arrow">▶</div>解释
-      </div>
-      <div class="fold-collapse collapse" id="collapse-bb76695e">
-        <div class="fold-content">
-          <p><u>每一行代表的都是一个事件产生的账户变动</u>，这个变动显然是双向的，要符合借贷必相等的原则。<br>为什么第一行不符合特征呢？因为商户本质是要收钱的，这个钱本身就是由外部用户的银行卡流入我们平台再结算给商户的。<br>换句话来说，我向第一个杯子里倒了水，此时第一个杯子里的水就独立的增加了，后续向第二第三个杯子里转移水的时候，前一个杯子里的水会减少，后一个杯子里的水会增加。</p>
-        </div>
-      </div>
-    </div>
+<p>scroll</p>
+<p>生成一个有过期时间的视图，到期之前操作的都是视图内的数据，无法感知新的变更。</p>
 </li>
 <li>
-<p>符号与账户类型对应</p>
-
-    <div class="fold">
-      <div class="fold-title fold-info collapsed" data-toggle="collapse" href="#collapse-2871e189" role="button" aria-expanded="false" aria-controls="collapse-2871e189">
-        <div class="fold-arrow">▶</div>解释
-      </div>
-      <div class="fold-collapse collapse" id="collapse-2871e189">
-        <div class="fold-content">
-          <p><u>账户本身的CD代表了账户的基本属性——表达资产还是负债</u>。<br>那么对应的，如果我是一个负债账户C，此时我又额外背上了一笔贷款，显然我在这个账户上应该使用加法，而不是减法。<br>同样，如果我还清了一笔债务D，那么我应该使用减法，而不是加法。</p>
-        </div>
-      </div>
-    </div>
+<p>searchAfter</p>
+<p>每次只能翻一页，但性能很好。</p>
 </li>
-</ul>
-<hr>
-<h3 id="三、账户的功能">三、账户的功能</h3>
-<p>现在我们可以尝试理解，为什么我们会定义这么多账户了，每个账户又有什么功能。<br>
-主要考虑以下两个方面：</p>
-<h4 id="账户的属性-——-资产还是负债">账户的属性 —— 资产还是负债?</h4>
-<p>这一步比较复杂，说起来也比较抽象，更像是一个逻辑题 / 文字游戏。我个人认为，单个账户本身的属性是什么都不重要，重要的是账户之间的关系。</p>
-<p>比如，我用 0 / 1 来标注账户属性显然是完全可以的，关键点在于当前账户的对手账户必须是我的属性的对立面。</p>
-<p>例如，商户的余额账户，显然和平台的备付金账户是对立的，因为商户的余额账户是平台的负债，而备付金账户是平台的资产。那么如果我用 1 标注了其中一者，那么另一个账户就必须用 0 标注。</p>
-<p>然后我们在&quot;符合逻辑&quot;的基础上，可以根据实际情况来定义账户的属性。比如前面说了，商户的余额账户，显然是平台的负债，我们就给它赋予 C 的属性，然后给备付金账户赋予 D 的属性。</p>
-<hr>
-<h4 id="账户的功能-——-用途是什么">账户的功能 —— 用途是什么?</h4>
-<p>如果我们直接去探究某一个具体账户的功能，可能会感觉有些头疼。因此我们需要转换一下思路：<br>
-当我们站在技术的视角上审视这个问题，可能会更简单一些。作为平台，我们显然需要对安全性和健壮性负责，避免出现任何资金的误差导致资金的亏损和信誉的下降。</p>
-<p>因此，我们可能会首先归纳出，外部事件的种类和功能，然后选取必要的事件进行消费，同时构建其状态机 —— 形成一个事件驱动的模型。<br>
-那么每个账户的功能就是在这个状态机中的一个节点，我们需要在这个节点上完成一些操作，然后将状态转移到下一个节点。</p>
-<p>举例来说，上述记账过程中，最抽象的账户是「C 网关过渡户」，这看起来就很 Hack，不像是金融领域的术语和模型。但是如果我们站在状态机的视角来观察，你会发现它的功能其实是很明确的：帮助我们消费「支付成功」这个事件，也就是说，如果「C 网关过渡户」里面的负债过多，那显然意味着外部平台的资金没有及时完成支付，我们需要联系对应的平台进行处理。</p>
-<p>类似的，如果我们的「D 应收应清算」里面的头寸过多，那么显然意味着外部平台比如银行没有及时的把资金转入我们的平台账户中，钱还卡在银行那，我们此时应该及时联系银行进行处理。</p>
+</ol>
+<p>我在飞书的实践中，用的是朴素解法，首先在业务层限制结果集最大 <code>10000</code> 条，然后用户可以自定义单页数量，比如 <code>500 Page * 20 Records</code>，下方允许进行随机跳转，跳转的逻辑是 <code>from + size</code>。</p>
 <blockquote>
-<p>上述没有及时结算的状态，在金融领域往往被称为「风险敞口」<br>
-这个敞口需要我们及时的进行处理，处理的过程往往被称为「头寸管理(Position Management)」或者「平盘」<br>
-如果平台不及时的进行平盘，那么显然当用户大量提现的时候，平台就会出现资金链断裂的情况，导致资金的亏损和信誉的下降。</p>
+<p>同时系统需要支持导出数据，比如用户希望将某个搜索结果集导出为 Excel，这个场景下我们封装到异步任务中使用 <code>searchAfter</code> 轮询导出。</p>
 </blockquote>
-<br>
-为了方便理解以上陈述，我们做出一个假设：银行渠道扣款和支付成功是一回事，于是可以剔除「C 网关过渡户」进行简化，表格也就变成了如下样貌：
-<table>
-<thead>
-<tr>
-<th>事件</th>
-<th>D 应收待清算</th>
-<th>C 商户待结算</th>
-<th>D 应收应清算</th>
-<th>D 备付金头寸</th>
-<th>C 商户余额户</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>渠道扣款成功</td>
-<td>D + 5</td>
-<td>C + 5</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>网联清分完成(完成明细对账)</td>
-<td>C - 5</td>
-<td></td>
-<td>D + 5</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>资金到账(完成资金对账)</td>
-<td></td>
-<td></td>
-<td>C - 5</td>
-<td>D + 5</td>
-<td></td>
-</tr>
-<tr>
-<td>结算完成</td>
-<td></td>
-<td>D - 5</td>
-<td></td>
-<td></td>
-<td>C + 5</td>
-</tr>
-</tbody>
-</table>
-<p>明细对账？我们也不要了！钱收到了就行！</p>
-<table>
-<thead>
-<tr>
-<th>事件</th>
-<th>D 应收待清算</th>
-<th>C 商户待结算</th>
-<th>D 备付金头寸</th>
-<th>C 商户余额户</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>渠道扣款成功</td>
-<td>D + 5</td>
-<td>C + 5</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>资金到账(完成资金对账)</td>
-<td>C - 5</td>
-<td></td>
-<td>D + 5</td>
-<td></td>
-</tr>
-<tr>
-<td>结算完成</td>
-<td></td>
-<td>D - 5</td>
-<td></td>
-<td>C + 5</td>
-</tr>
-</tbody>
-</table>
-<p>再简化就不礼貌了，也不现实了，但我们可以让它变得更抽象，更明显的表达状态机的思想：</p>
-<table>
-<thead>
-<tr>
-<th>Events</th>
-<th>D Account1</th>
-<th>C Account2</th>
-<th>D Position</th>
-<th>C Merchant</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Init Event</td>
-<td>D + 5</td>
-<td>C + 5</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>Processing Event</td>
-<td>C - 5</td>
-<td></td>
-<td>D + 5</td>
-<td></td>
-</tr>
-<tr>
-<td>Final Event</td>
-<td></td>
-<td>D - 5</td>
-<td></td>
-<td>C + 5</td>
-</tr>
-</tbody>
-</table>
+<p><strong>向前翻页问题</strong></p>
+<p>有的业务可能根据使用习惯，约定向前翻页的结果为视图，向后翻页的结果允许更新 —— 既不是全局视图，也不是全局动态。这个需求在数据量小的场景可以直接缓存查看过的页面结果集到 Redis，向前翻页时取缓存即可。</p>
+<p>大数据量的场景下没有很好的解法，但是一般来说，搜索结果集都会根据特定 Attribute 进行排序，且这个 Attribute 是递增的，插入数据不会影响前置结果集。例如根据创建时间倒序，或者业务保证 doc id 全局有序递增，然后使用这个 id 排序也可以，页面跳转时可以选择重新触发一次搜索来替代缓存。</p>
+<h2 id="异步和一致性">异步和一致性</h2>
+<p>假设一个接口的影响是修改 N 张表，其中一张为主表，其余为关联表，并且这些表之间的数据可能有「一致性」的要求。</p>
+<p><strong>朴素方式：</strong></p>
+<p>业务量小的时候，或者说 N 比较小的时候，直接将变更SQL都放在一个事务当中同步写入。</p>
+<p><strong>异步方式：</strong></p>
+<p>假设业务量逐渐增大，或者是 N 比较大，比如 N = 10，亦或是我们可以将这个场景转化为微服务的调用，比如一个请求的处理逻辑，涉及到调用下游 N 个微服务的 API —— 本质上都是 IO 慢，只是一个是数据库 IO，另一个是网络 IO。此时我们需要考虑将部分“不重要的” IO 异步化来提升接口性能。</p>
+<p>根据实际业务，将接口逻辑调整为：主要数据同步修改+允许一定延迟的关联数据异步修改。</p>
+<p><u>异步化的实现方式一般如下：</u></p>
+<ul>
+<li>内存 spawn 异步任务，coroutine / thread</li>
+<li>消息队列 MQ</li>
+<li>消息表</li>
+</ul>
+<p>基于内存的方式只适用于对数据没有一致性要求的场景，比如 metrics 等。</p>
+<p>基于 MQ 的方式，在实现上一般有一个典型的挑战：写数据库和写MQ之间的事务性如何保证。</p>
+<div class="note note-light">
+            <p>数据库和缓存之间的一致性也是一个常见的问题，但是注意区分和这个场景的区别：</p><p>缓存与数据库之间的不一致是&quot;无状态&quot;的，也就是说，即使缓存和数据库之间存在不一致，也可以通过过期或者删除等机制来解决。下次读取之后，两侧数据就能保持一致。</p><p>但是数据库和 MQ 之间的一致性问题&quot;可能是有状态&quot;的，比如假设消息的消费在业务上是具有顺序性的，那么丢失/漏发消息是完全无法接受的。比如消费的逻辑是一个状态机，将任务按照 A - B - C 的顺序进行流转，那么一旦丢失了 B 消息，哪怕接到了多条 C 消息，也无法实现 A - C 的流转。</p>
+          </div>
+<p><u>双写的事务性一般可以有如下几种解决方式：</u></p>
+<ol>
+<li>
+<p>利用 RocketMQ 的事务消息</p>
+<blockquote>
+<p>TIPS: 这种消息本质上是 2PC，为了适应网络或其它类型的通信故障，还要求服务提供对应的回调接口来进行重试。</p>
+</blockquote>
+</li>
+<li>
+<p>先写 Kafka，然后基于 Kafka 消息进行所有数据库的修改<br>
+如果要求实时性，可以尝试立即写入一次主表数据库，然后消费时幂等处理，极端情况下立即写入失败可能会延迟。需要根据实际业务考量。比如我在交易所基础架构团队工作时，就是采用的这种方式进行的历史 K 线数据的落库。</p>
+</li>
+</ol>
+<p><u>消息表是另外一种思路：</u></p>
+<p>也就是将事务落库 N 张表，修改为事务落库 1（主表） + 1（消息表）张表。然后异步处理的逻辑基于消息表进行，这样能以一种比较简单的方式实现一致性，但是也会造成一定延迟问题。</p>
 
                 
               </div>
@@ -594,7 +385,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/dessert/" class="category-chain-item">dessert</a>
+  <a href="/categories/tech/" class="category-chain-item">tech</a>
   
   
 
@@ -609,7 +400,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Finance/" class="print-no-link">#Finance</a>
+        <a href="/tags/Backend/" class="print-no-link">#Backend</a>
+      
+        <a href="/tags/Misc/" class="print-no-link">#Misc</a>
       
     </div>
   
@@ -621,8 +414,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>复式记账法</div>
-      <div>https://kayce.world/dessert/double_entry_bookkeeping/</div>
+      <div>Scenario Misc</div>
+      <div>https://kayce.world/tech/scenario_misc/</div>
     </div>
     <div class="license-meta">
       
@@ -634,7 +427,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>Posted on</div>
-          <div>December 16, 2024</div>
+          <div>January 19, 2025</div>
         </div>
       
       
@@ -678,18 +471,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/tech/rust_atomics_and_locks/" title="Rust Atomics and Locks">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Rust Atomics and Locks</span>
-                        <span class="visible-mobile">Previous</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/chores/chores/" title="Chores">
-                        <span class="hidden-mobile">Chores</span>
+                      <a href="/tech/signature_based_auth_arch/" title="基于签名的鉴权架构">
+                        <span class="hidden-mobile">基于签名的鉴权架构</span>
                         <span class="visible-mobile">Next</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -712,7 +499,7 @@
         var options = Object.assign(
           {"clientID":"b25aa0a3d88c5fc4dbeb","clientSecret":"485e76d306112a519d43b4118efa8971c3ff6069","repo":"sshelll.github.io","owner":"sshelll","admin":["sshelll"],"language":"en-US","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
           {
-            id: 'dcdc360a44a718b4b5bf6901079bb19d'
+            id: 'a8e5d6ce7da0fd9d57dbbe37d68a7854'
           }
         )
         var gitalk = new Gitalk(options);
